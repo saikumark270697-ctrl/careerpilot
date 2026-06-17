@@ -54,11 +54,13 @@ const Dashboard = () => {
           setAppliedJobs(prev => ({ ...prev, [jobId]: 'success' }));
         }
       } else {
-        alert('Auto-apply encountered an issue: ' + (data.detail || 'Failed'));
+        alert('Auto-apply encountered an issue (e.g. CAPTCHA or missing fields). Routing to manual apply.');
+        setAppliedJobs(prev => ({ ...prev, [jobId]: 'manual' }));
       }
     } catch (err) {
       console.error('Auto-apply error:', err);
-      alert('Failed to run auto-apply agent.');
+      alert('Auto-apply failed. Routing to manual apply.');
+      setAppliedJobs(prev => ({ ...prev, [jobId]: 'manual' }));
     } finally {
       setApplyingJobs(prev => ({ ...prev, [jobId]: false }));
     }
@@ -289,7 +291,15 @@ const Dashboard = () => {
                 <div key={job.id} className="job-card" style={{ animation: `fadeIn 0.5s ease-out ${0.1 * index}s backwards` }}>
                   <div className="job-header" style={{ alignItems: 'flex-start' }}>
                     <div>
-                      <h3 className="job-title">{job.title}</h3>
+                      <h3 className="job-title">
+                        {job.url ? (
+                          <a href={job.url} target="_blank" rel="noopener noreferrer" style={{ textDecoration: 'none', color: 'inherit' }}>
+                            {job.title}
+                          </a>
+                        ) : (
+                          job.title
+                        )}
+                      </h3>
                       <div className="job-company" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
                         {job.company}
                         {job.platform && (
