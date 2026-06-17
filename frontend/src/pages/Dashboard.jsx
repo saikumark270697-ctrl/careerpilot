@@ -128,29 +128,28 @@ const Dashboard = () => {
 
   return (
     <div className="animate-fade-in">
-      <div style={{ textAlign: 'center', marginBottom: '3rem' }}>
-        <h1 style={{ fontSize: '3rem', fontWeight: '800', marginBottom: '1rem', letterSpacing: '-1px' }}>
+      <div className="hero-copy">
+        <h1 className="heading-1">
           Your <span className="logo">Career Copilot</span>
         </h1>
-        <p style={{ color: 'var(--text-secondary)', fontSize: '1.125rem', maxWidth: '600px', margin: '0 auto' }}>
+        <p className="hero-subtitle">
           Upload your resume, specify your target role, and let our AI evaluate your ATS score while fetching the perfect live job matches.
         </p>
       </div>
       
       <div className="dashboard-grid">
         {/* Left Column: Inputs & Score */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
+        <div className="panel-stack">
           <div className="card glass-panel">
-            <h2><UploadCloud className="logo" size={24} /> Resume & Preferences</h2>
+            <h2 className="heading-2"><UploadCloud className="title-icon" size={24} /> Resume & Preferences</h2>
             
-            <div style={{ marginBottom: '1.5rem' }}>
-              <label style={{ display: 'block', marginBottom: '0.5rem', color: 'var(--text-secondary)', fontSize: '0.875rem' }}>Target Role (Optional)</label>
-              <div style={{ position: 'relative' }}>
-                <Briefcase size={18} style={{ position: 'absolute', left: '1rem', top: '1rem', color: 'var(--text-secondary)' }} />
+            <div className="form-field">
+              <label>Target Role (Optional)</label>
+              <div className="input-shell">
+                <Briefcase size={18} />
                 <input 
                   type="text" 
                   className="glass-input" 
-                  style={{ paddingLeft: '3rem', marginBottom: '0' }}
                   placeholder="e.g. Frontend Engineer" 
                   value={targetRole}
                   onChange={(e) => setTargetRole(e.target.value)}
@@ -158,14 +157,13 @@ const Dashboard = () => {
               </div>
             </div>
 
-            <div style={{ marginBottom: '1.5rem' }}>
-              <label style={{ display: 'block', marginBottom: '0.5rem', color: 'var(--text-secondary)', fontSize: '0.875rem' }}>Location</label>
-              <div style={{ position: 'relative' }}>
-                <MapPin size={18} style={{ position: 'absolute', left: '1rem', top: '1rem', color: 'var(--text-secondary)' }} />
+            <div className="form-field">
+              <label>Location</label>
+              <div className="input-shell">
+                <MapPin size={18} />
                 <input 
                   type="text" 
                   className="glass-input" 
-                  style={{ paddingLeft: '3rem', marginBottom: '0' }}
                   placeholder="e.g. Remote, New York" 
                   value={location}
                   onChange={(e) => setLocation(e.target.value)}
@@ -173,8 +171,8 @@ const Dashboard = () => {
               </div>
             </div>
 
-            <div style={{ marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '1rem' }}>
-              <label className="btn-primary" style={{ cursor: 'pointer', padding: '0.5rem 1rem', display: 'inline-flex', width: 'auto', fontSize: '0.875rem', borderRadius: '8px' }}>
+            <div className="upload-row">
+              <label className="btn-primary upload-btn">
                 <UploadCloud size={18} />
                 {isProcessing ? 'Processing...' : 'Upload File'}
                 <input 
@@ -185,7 +183,7 @@ const Dashboard = () => {
                   disabled={isProcessing}
                 />
               </label>
-              <span style={{ color: 'var(--text-secondary)', fontSize: '0.875rem' }}>or paste text below</span>
+              <span>or paste text below</span>
             </div>
             
             <textarea 
@@ -199,7 +197,6 @@ const Dashboard = () => {
               className="btn-primary" 
               onClick={handleAnalyze}
               disabled={isProcessing || !resumeText}
-              style={{ padding: '1rem', fontSize: '1.125rem' }}
             >
               <Search size={20} />
               {isProcessing ? 'Analyzing...' : 'Analyze & Find Jobs'}
@@ -208,7 +205,7 @@ const Dashboard = () => {
 
           {atsScore !== null && (
             <div className="card glass-panel animate-fade-in" style={{ animationDelay: '0.2s' }}>
-              <h2><CheckCircle2 className="logo" size={24} /> ATS Analysis</h2>
+              <h2 className="heading-2"><CheckCircle2 className="title-icon" size={24} /> ATS Analysis</h2>
               
               <div style={{ display: 'flex', alignItems: 'center', gap: '2rem', marginBottom: '2rem' }}>
                 <div style={{ width: '120px', height: '120px', flexShrink: 0 }}>
@@ -227,8 +224,8 @@ const Dashboard = () => {
                   />
                 </div>
                 <div>
-                  <h3 style={{ fontSize: '1.25rem', marginBottom: '0.5rem' }}>Overall Compatibility</h3>
-                  <p style={{ color: 'var(--text-secondary)', fontSize: '0.875rem', lineHeight: '1.5' }}>
+                  <h3 className="body-strong">Overall Compatibility</h3>
+                  <p className="body-muted">
                     This score reflects how well your resume matches {targetRole ? `the ${targetRole} role` : 'industry standards'} based on keywords, structure, and formatting.
                   </p>
                 </div>
@@ -236,12 +233,12 @@ const Dashboard = () => {
 
               {feedback && feedback.length > 0 && (
                 <div>
-                  <h4 style={{ marginBottom: '1rem', color: '#e2e8f0' }}>Actionable Feedback</h4>
+                  <h4 className="body-strong">Actionable Feedback</h4>
                   <ul className="feedback-list">
                     {feedback.map((item, i) => (
                       <li key={i} className="feedback-item">
-                        <AlertCircle size={18} style={{ color: 'var(--primary)', flexShrink: 0, marginTop: '2px' }} />
-                        <span style={{ fontSize: '0.9rem', lineHeight: '1.4' }}>{item}</span>
+                        <AlertCircle className="feedback-icon" size={18} />
+                        <span>{item}</span>
                       </li>
                     ))}
                   </ul>
@@ -252,37 +249,37 @@ const Dashboard = () => {
         </div>
 
         {/* Right Column: Live Jobs */}
-        <div className="card glass-panel" style={{ minHeight: '600px' }}>
-          <h2><Briefcase className="logo" size={24} /> Live Job Matches</h2>
+        <div className="card glass-panel jobs-panel">
+          <h2 className="heading-2"><Briefcase className="title-icon" size={24} /> Live Job Matches</h2>
           
           {searchQuery && (
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem', paddingBottom: '1rem', borderBottom: '1px solid var(--glass-border)' }}>
-              <p style={{ color: 'var(--text-secondary)', fontSize: '1rem' }}>
+            <div className="results-summary">
+              <p>
                 Results for: <strong className="logo">{searchQuery}</strong>
               </p>
-              <span className="match-badge" style={{ background: 'transparent', border: '1px solid var(--glass-border)', color: 'var(--text-primary)' }}>
+              <span className="match-badge match-badge-outline">
                 {jobs.length} Jobs Found
               </span>
             </div>
           )}
           
           {error && (
-            <div style={{ padding: '1rem', background: 'rgba(239, 68, 68, 0.1)', border: '1px solid rgba(239, 68, 68, 0.3)', borderRadius: '12px', color: '#fca5a5', display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+            <div className="error-banner">
               <AlertCircle size={20} />
               <p>{error}</p>
             </div>
           )}
           
           {jobs.length === 0 && !error && !isProcessing ? (
-            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '300px', textAlign: 'center', color: 'var(--text-secondary)' }}>
-              <Briefcase size={48} style={{ opacity: 0.2, marginBottom: '1rem' }} />
-              <p style={{ fontSize: '1.125rem' }}>No jobs to display yet.</p>
-              <p style={{ fontSize: '0.875rem', marginTop: '0.5rem' }}>Upload your resume and click Analyze to fetch live listings.</p>
+            <div className="empty-state">
+              <Briefcase size={48} />
+              <p className="body-strong">No jobs to display yet.</p>
+              <p>Upload your resume and click Analyze to fetch live listings.</p>
             </div>
           ) : isProcessing ? (
-            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '300px', textAlign: 'center' }}>
-              <div style={{ width: '40px', height: '40px', borderRadius: '50%', border: '3px solid var(--glass-border)', borderTopColor: 'var(--primary)', animation: 'spin 1s linear infinite', marginBottom: '1rem' }}></div>
-              <p style={{ color: 'var(--primary)', fontWeight: '500', animation: 'pulse 2s infinite' }}>Searching live databases...</p>
+            <div className="loading-state">
+              <div className="loading-spinner"></div>
+              <p>Searching live databases...</p>
               <style>{`@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } } @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }`}</style>
             </div>
           ) : (
@@ -293,23 +290,23 @@ const Dashboard = () => {
                     <div>
                       <h3 className="job-title">
                         {job.url ? (
-                          <a href={job.url} target="_blank" rel="noopener noreferrer" style={{ textDecoration: 'none', color: 'inherit' }}>
+                          <a href={job.url} target="_blank" rel="noopener noreferrer">
                             {job.title}
                           </a>
                         ) : (
                           job.title
                         )}
                       </h3>
-                      <div className="job-company" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
+                      <div className="job-company">
                         {job.company}
                         {job.platform && (
-                          <span className="match-badge" style={{ fontSize: '0.7rem', padding: '0.1rem 0.4rem', background: 'rgba(255,255,255,0.1)', color: 'var(--text-secondary)' }}>
+                          <span className="match-badge platform-badge">
                             {job.platform}
                           </span>
                         )}
                         {job.posted_at && (
-                          <span style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>
-                            • {timeAgo(job.posted_at)}
+                          <span className="posted-date">
+                            - {timeAgo(job.posted_at)}
                           </span>
                         )}
                       </div>
@@ -365,4 +362,3 @@ const Dashboard = () => {
 };
 
 export default Dashboard;
-
