@@ -144,7 +144,7 @@ const Dashboard = () => {
             <h2 className="heading-2"><UploadCloud className="title-icon" size={24} /> Resume & Preferences</h2>
             
             <div className="form-field">
-              <label>Target Role (Optional)</label>
+              <label className="body-text-bold">Target Role (Optional)</label>
               <div className="input-shell">
                 <Briefcase size={18} />
                 <input 
@@ -158,7 +158,7 @@ const Dashboard = () => {
             </div>
 
             <div className="form-field">
-              <label>Location</label>
+              <label className="body-text-bold">Location</label>
               <div className="input-shell">
                 <MapPin size={18} />
                 <input 
@@ -183,7 +183,7 @@ const Dashboard = () => {
                   disabled={isProcessing}
                 />
               </label>
-              <span>or paste text below</span>
+              <span className="body-text">or paste text below</span>
             </div>
             
             <textarea 
@@ -224,8 +224,8 @@ const Dashboard = () => {
                   />
                 </div>
                 <div>
-                  <h3 className="body-strong">Overall Compatibility</h3>
-                  <p className="body-muted">
+                  <h3 className="body-text-bold">Overall Compatibility</h3>
+                  <p className="body-text" style={{ color: 'var(--text-secondary)' }}>
                     This score reflects how well your resume matches {targetRole ? `the ${targetRole} role` : 'industry standards'} based on keywords, structure, and formatting.
                   </p>
                 </div>
@@ -233,12 +233,12 @@ const Dashboard = () => {
 
               {feedback && feedback.length > 0 && (
                 <div>
-                  <h4 className="body-strong">Actionable Feedback</h4>
+                  <h4 className="body-text-bold" style={{ marginBottom: '1rem' }}>Actionable Feedback</h4>
                   <ul className="feedback-list">
                     {feedback.map((item, i) => (
                       <li key={i} className="feedback-item">
                         <AlertCircle className="feedback-icon" size={18} />
-                        <span>{item}</span>
+                        <span className="body-text">{item}</span>
                       </li>
                     ))}
                   </ul>
@@ -254,7 +254,7 @@ const Dashboard = () => {
           
           {searchQuery && (
             <div className="results-summary">
-              <p>
+              <p className="body-text">
                 Results for: <strong className="logo">{searchQuery}</strong>
               </p>
               <span className="match-badge match-badge-outline">
@@ -266,20 +266,20 @@ const Dashboard = () => {
           {error && (
             <div className="error-banner">
               <AlertCircle size={20} />
-              <p>{error}</p>
+              <p className="body-text-bold">{error}</p>
             </div>
           )}
           
           {jobs.length === 0 && !error && !isProcessing ? (
             <div className="empty-state">
               <Briefcase size={48} />
-              <p className="body-strong">No jobs to display yet.</p>
-              <p>Upload your resume and click Analyze to fetch live listings.</p>
+              <p className="body-text-bold">No jobs to display yet.</p>
+              <p className="body-text">Upload your resume and click Analyze to fetch live listings.</p>
             </div>
           ) : isProcessing ? (
             <div className="loading-state">
               <div className="loading-spinner"></div>
-              <p>Searching live databases...</p>
+              <p className="body-text-bold" style={{ color: 'var(--primary)' }}>Searching live databases...</p>
               <style>{`@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } } @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }`}</style>
             </div>
           ) : (
