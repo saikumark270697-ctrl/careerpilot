@@ -1,11 +1,12 @@
 import os
 from openai import OpenAI
 
-OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY")
-client = OpenAI(
-    base_url="https://openrouter.ai/api/v1",
-    api_key=OPENROUTER_API_KEY,
-)
+def _get_client():
+    api_key = os.getenv("OPENROUTER_API_KEY") or "dummy_key"
+    return OpenAI(
+        base_url="https://openrouter.ai/api/v1",
+        api_key=api_key,
+    )
 
 def generate_cover_letter(resume_details: dict, job_listing: dict) -> str:
     """
@@ -38,7 +39,7 @@ def generate_cover_letter(resume_details: dict, job_listing: dict) -> str:
     """
     
     try:
-        response = client.chat.completions.create(
+        response = _get_client().chat.completions.create(
             model="meta-llama/llama-3-8b-instruct:free",
             messages=[
                 {"role": "system", "content": "You are a professional cover letter writer."},

@@ -3,11 +3,12 @@ import re
 import json
 from openai import OpenAI
 
-GROQ_API_KEY = os.getenv("GROQ_API_KEY")
-client = OpenAI(
-    base_url="https://api.groq.com/openai/v1",
-    api_key=GROQ_API_KEY,
-)
+def _get_client():
+    api_key = os.getenv("GROQ_API_KEY") or os.getenv("OPENROUTER_API_KEY") or "dummy_key"
+    return OpenAI(
+        base_url="https://api.groq.com/openai/v1",
+        api_key=api_key,
+    )
 
 JOB_TITLES = [
     "machine learning engineer",
@@ -100,7 +101,7 @@ def extract_resume_details(resume_text: str, target_role: str = "") -> dict:
     """
 
     try:
-        response = client.chat.completions.create(
+        response = _get_client().chat.completions.create(
             model="llama-3.1-8b-instant",
             messages=[
                 {"role": "system", "content": "You are a helpful assistant that outputs only JSON."},

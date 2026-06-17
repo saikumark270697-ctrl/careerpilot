@@ -16,9 +16,10 @@ _index_initialized = False
 def _get_client() -> OpenAI:
     global _client
     if _client is None:
+        api_key = os.getenv("OPENROUTER_API_KEY") or "dummy_key"
         _client = OpenAI(
             base_url="https://openrouter.ai/api/v1",
-            api_key=OPENROUTER_API_KEY,
+            api_key=api_key,
         )
     return _client
 
