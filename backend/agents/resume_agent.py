@@ -4,9 +4,9 @@ import json
 from openai import OpenAI
 
 def _get_client():
-    api_key = os.getenv("GROQ_API_KEY") or os.getenv("OPENROUTER_API_KEY") or "dummy_key"
+    api_key = os.getenv("OPENROUTER_API_KEY") or "dummy_key"
     return OpenAI(
-        base_url="https://api.groq.com/openai/v1",
+        base_url="https://openrouter.ai/api/v1",
         api_key=api_key,
     )
 
@@ -102,14 +102,23 @@ def extract_resume_details(resume_text: str, target_role: str = "") -> dict:
 
     try:
         response = _get_client().chat.completions.create(
-            model="llama-3.1-8b-instant",
+            model="meta-llama/llama-3.1-8b-instruct:free",
             messages=[
-                {"role": "system", "content": "You are a helpful assistant that outputs only JSON."},
+                {"role": "system", "content": "You are a helpful assistant that outputs ONLY valid JSON, with no markdown formatting or extra text."},
                 {"role": "user", "content": prompt},
             ],
-            response_format={"type": "json_object"},
         )
-        content = response.choices[0].message.content
+        content = response.choices[0].message.content.strip()
+        
+        # Robustly parse JSON even if wrapped in markdown
+        if content.startswith("```json"):
+            content = content[7:]
+        elif content.startswith("```"):
+            content = content[3:]
+        if content.endswith("```"):
+            content = content[:-3]
+        content = content.strip()
+        
         parsed = json.loads(content)
         if parsed.get("skills") or parsed.get("job_search_query"):
             # Ensure defaults for new fields
