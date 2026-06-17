@@ -4,10 +4,18 @@ import json
 from openai import OpenAI
 
 def _get_client():
-    api_key = os.getenv("GROQ_API_KEY") or "dummy_key"
+    # Try OpenRouter first, then fallback to Groq
+    openrouter_key = os.getenv("OPENROUTER_API_KEY")
+    if openrouter_key:
+        return OpenAI(
+            base_url="https://openrouter.ai/api/v1",
+            api_key=openrouter_key,
+        )
+    
+    # Fallback to Groq if OpenRouter is missing
     return OpenAI(
         base_url="https://api.groq.com/openai/v1",
-        api_key=api_key,
+        api_key=os.getenv("GROQ_API_KEY", "dummy_key"),
     )
 
 JOB_TITLES = [
@@ -39,12 +47,23 @@ def _fallback_extract(resume_text: str, target_role: str = "") -> dict:
     lines = [line.strip() for line in resume_text.splitlines() if line.strip()]
     name = lines[0] if lines else "Unknown"
 
-    job_search_query = target_role if target_role else "software engineer"
-    if not target_role:
-        for title in JOB_TITLES:
-            if title in text:
-                job_search_query = title.title()
-                break
+    job_search_query = target_role if target_role else ""
+    if not job_search_query:
+        # Check for specific developer roles first to avoid bad fallback matches
+        if ".net" in text or "c#" in text:
+            job_search_query = ".NET Developer"
+        elif "react" in text or "frontend" in text:
+            job_search_query = "Frontend Engineer"
+        elif "python" in text or "backend" in text:
+            job_search_query = "Backend Engineer"
+        else:
+            for title in JOB_TITLES:
+                if title in text:
+                    job_search_query = title.title()
+                    break
+            
+        if not job_search_query:
+            job_search_query = "Software Engineer"
 
     skills = []
     for skill in COMMON_SKILLS:
@@ -55,8 +74,8 @@ def _fallback_extract(resume_text: str, target_role: str = "") -> dict:
     email_match = re.search(r"[\w.+-]+@[\w-]+\.[\w.-]+", resume_text)
     email = email_match.group(0) if email_match else ""
 
-    # Basic ATS fallback calculation
-    score = min(100, 40 + (len(skills) * 5))
+    # Basic ATS fallback calculation - STRICTER SCORING
+    score = min(65, 30 + (len(skills) * 3))
     
     return {
         "name": name,
@@ -78,8 +97,13 @@ def extract_resume_details(resume_text: str, target_role: str = "") -> dict:
     role_context = f"The candidate is targeting a '{target_role}' role." if target_role else "Infer the best matching job role based on their experience."
     
     prompt = f"""
-    You are an expert HR Applicant Tracking System (ATS). Extract information and score the resume below.
+    You are a STRICT and EXPERT HR Applicant Tracking System (ATS). Extract information and score the resume below.
     {role_context}
+    
+    IMPORTANT SCORING RULES:
+    - Be extremely critical. Most standard resumes should score between 30 and 65.
+    - Only give above 75 if the resume PERFECTLY matches the target role with quantifiable metrics, perfect formatting, and exact keyword matches.
+    - If the resume is missing key industry skills or lacks quantifiable results, penalize the score heavily.
     
     Return ONLY a valid JSON object with the following structure:
     {{
@@ -87,13 +111,13 @@ def extract_resume_details(resume_text: str, target_role: str = "") -> dict:
         "email": "Email address",
         "skills": ["Skill 1", "Skill 2"],
         "summary": "A brief 2-sentence summary of the candidate's profile.",
-        "job_search_query": "Best job title to search for (e.g. Data Scientist, Frontend Engineer)",
-        "overall_ats_score": 85, // An integer between 0 and 100 representing the resume's match for the target/inferred role.
+        "job_search_query": "The most accurate, specific job title based on their primary expertise (e.g. .NET Backend Developer, Senior React Engineer, DevOps Engineer)",
+        "overall_ats_score": 45, // Be strict! An integer between 0 and 100.
         "feedback_breakdown": [
-            "A specific point of feedback on missing keywords or skills.",
-            "A point on formatting or clarity.",
-            "A strength observed in the resume."
-        ] // Exactly 3-4 short, actionable sentences of feedback in a list.
+            "CRITICAL: Point out a major missing skill or keyword related to their domain.",
+            "WARNING: Point out a formatting issue or lack of metrics.",
+            "SUGGESTION: Tell them exactly what to add to improve the ATS score."
+        ] // Exactly 3 strict, actionable sentences of feedback.
     }}
 
     Resume Text:
@@ -101,8 +125,9 @@ def extract_resume_details(resume_text: str, target_role: str = "") -> dict:
     """
 
     try:
+        model_name = "meta-llama/llama-3.1-8b-instruct" if os.getenv("OPENROUTER_API_KEY") else "llama-3.1-8b-instant"
         response = _get_client().chat.completions.create(
-            model="llama-3.1-8b-instant",
+            model=model_name,
             messages=[
                 {"role": "system", "content": "You are a helpful assistant that outputs ONLY valid JSON, with no markdown formatting or extra text."},
                 {"role": "user", "content": prompt},
