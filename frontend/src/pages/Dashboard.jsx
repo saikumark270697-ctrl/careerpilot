@@ -3,7 +3,7 @@ import { CircularProgressbar } from 'react-circular-progressbar';
 import 'react-circular-progressbar/dist/styles.css';
 import { UploadCloud, Search, MapPin, Briefcase, ExternalLink, AlertCircle, CheckCircle2 } from 'lucide-react';
 
-const API_BASE = 'http://localhost:8000';
+const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:8000';
 
 const Dashboard = () => {
   const [resumeText, setResumeText] = useState('');
