@@ -105,13 +105,18 @@ def extract_resume_details(resume_text: str, target_role: str = "") -> dict:
     - Only give above 75 if the resume PERFECTLY matches the target role with quantifiable metrics, perfect formatting, and exact keyword matches.
     - If the resume is missing key industry skills or lacks quantifiable results, penalize the score heavily.
     
+    IMPORTANT JOB TITLE RULES:
+    - The "job_search_query" MUST be the candidate's primary, most recent job title (e.g., "Senior Software Engineer", ".NET Developer", "Frontend Engineer").
+    - DO NOT combine skills into weird titles like "Cloud-Enabled DevOps Engineer".
+    - If they are a Software Engineer who knows AWS/DevOps, the title is "Software Engineer" or ".NET Developer". DO NOT call them a DevOps Engineer unless their actual title is DevOps Engineer.
+    
     Return ONLY a valid JSON object with the following structure:
     {{
         "name": "Full Name",
         "email": "Email address",
         "skills": ["Skill 1", "Skill 2"],
         "summary": "A brief 2-sentence summary of the candidate's profile.",
-        "job_search_query": "The most accurate, specific job title based on their primary expertise (e.g. .NET Backend Developer, Senior React Engineer, DevOps Engineer)",
+        "job_search_query": "The EXACT primary job title (e.g. '.NET Developer' or 'Senior Software Engineer'). DO NOT hallucinate titles based on secondary skills.",
         "overall_ats_score": 45, // Be strict! An integer between 0 and 100.
         "feedback_breakdown": [
             "CRITICAL: Point out a major missing skill or keyword related to their domain.",
