@@ -12,6 +12,10 @@ def _fetch_jobs(query: str, location: str, num_pages: int, platform: str) -> Lis
         search_query = f"{query} in {location} site:linkedin.com"
     elif platform == "Naukri":
         search_query = f"{query} in {location} site:naukri.com"
+    elif platform == "Monster":
+        search_query = f"{query} in {location} site:monster.com"
+    elif platform == "Foundit":
+        search_query = f"{query} in {location} site:foundit.in"
     else:
         search_query = f"{query} in {location}"
         
@@ -51,12 +55,12 @@ def _fetch_jobs(query: str, location: str, num_pages: int, platform: str) -> Lis
 
 def search_jobs(query: str, location: str = "remote", num_pages: int = 1) -> List[dict]:
     """
-    Searches for jobs using the JSearch API from RapidAPI, running parallel searches for General, LinkedIn, and Naukri.
+    Searches for jobs using the JSearch API from RapidAPI, running parallel searches for General, LinkedIn, Naukri, Monster, and Foundit.
     """
-    platforms = ["General", "LinkedIn", "Naukri"]
+    platforms = ["General", "LinkedIn", "Naukri", "Monster", "Foundit"]
     all_jobs = []
     
-    with concurrent.futures.ThreadPoolExecutor(max_workers=3) as executor:
+    with concurrent.futures.ThreadPoolExecutor(max_workers=5) as executor:
         future_to_platform = {
             executor.submit(_fetch_jobs, query, location, num_pages, platform): platform 
             for platform in platforms
