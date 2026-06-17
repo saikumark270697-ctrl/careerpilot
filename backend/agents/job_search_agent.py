@@ -53,20 +53,18 @@ def _fetch_jobs(query: str, location: str, num_pages: int, platform: str) -> Lis
         print(f"Error fetching jobs from RapidAPI ({platform}): {e}")
         return []
 
+import time
+
 def search_jobs(query: str, location: str = "remote", num_pages: int = 1) -> List[dict]:
     """
-    Searches for jobs using the JSearch API from RapidAPI, running parallel searches for General, LinkedIn, Naukri, Monster, and Foundit.
+    Searches for jobs using the JSearch API from RapidAPI sequentially to avoid rate limits.
     """
     platforms = ["General", "LinkedIn", "Naukri", "Monster", "Foundit"]
     all_jobs = []
     
-    with concurrent.futures.ThreadPoolExecutor(max_workers=5) as executor:
-        future_to_platform = {
-            executor.submit(_fetch_jobs, query, location, num_pages, platform): platform 
-            for platform in platforms
-        }
-        
-        for future in concurrent.futures.as_completed(future_to_platform):
-            all_jobs.extend(future.result())
+    for platform in platforms:
+        jobs = _fetch_jobs(query, location, num_pages, platform)
+        all_jobs.extend(jobs)
+        time.sleep(1.5) # Prevent 429 Too Many Requests on RapidAPI free tier
             
     return all_jobs
