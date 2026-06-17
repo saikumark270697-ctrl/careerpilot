@@ -1,7 +1,14 @@
 import os
 import re
 import json
+import hashlib
 from openai import OpenAI
+
+_ats_cache = {}
+
+def get_cache_key(resume_text: str, target_role: str) -> str:
+    key_str = f"{resume_text.strip()}_{target_role.strip()}".lower()
+    return hashlib.md5(key_str.encode("utf-8")).hexdigest()
 
 def _get_client():
     # Try OpenRouter first, then fallback to Groq
@@ -94,21 +101,30 @@ def _fallback_extract(resume_text: str, target_role: str = "") -> dict:
 
 def extract_resume_details(resume_text: str, target_role: str = "") -> dict:
     """Extract skills, target role, ATS score, and feedback from resume text using OpenRouter, with rule-based fallback."""
+    global _ats_cache
+    cache_key = get_cache_key(resume_text, target_role)
+    if cache_key in _ats_cache:
+        return _ats_cache[cache_key]
+
     role_context = f"The candidate is targeting a '{target_role}' role." if target_role else "Infer the best matching job role based on their experience."
     
     prompt = f"""
     You are a STRICT and EXPERT HR Applicant Tracking System (ATS). Extract information and score the resume below.
     {role_context}
     
-    IMPORTANT SCORING RULES:
-    - Be extremely critical. Most standard resumes should score between 30 and 65.
-    - Only give above 75 if the resume PERFECTLY matches the target role with quantifiable metrics, perfect formatting, and exact keyword matches.
-    - If the resume is missing key industry skills or lacks quantifiable results, penalize the score heavily.
+    IMPORTANT SCORING RULES (Strict Rubric):
+    - Base score is 30.
+    - Add up to 20 points for exact match of industry-standard tools/skills for their primary domain.
+    - Add up to 20 points if their work history has quantifiable metrics (percentages, dollar amounts, scale).
+    - Add up to 10 points for good formatting and clarity.
+    - Add up to 20 points if their past job titles perfectly align with the target role.
+    - Deduct points for generic filler, lack of details, or mismatched roles.
+    - A typical average resume should score between 40 and 60. ONLY truly exceptional resumes score above 80.
     
     IMPORTANT JOB TITLE RULES:
-    - The "job_search_query" MUST be the candidate's primary, most recent job title (e.g., "Senior Software Engineer", ".NET Developer", "Frontend Engineer").
-    - DO NOT combine skills into weird titles like "Cloud-Enabled DevOps Engineer".
-    - If they are a Software Engineer who knows AWS/DevOps, the title is "Software Engineer" or ".NET Developer". DO NOT call them a DevOps Engineer unless their actual title is DevOps Engineer.
+    - The "job_search_query" MUST be the candidate's exact primary domain/job title (e.g., ".NET Developer", "Frontend Engineer", "SAP Consultant").
+    - DO NOT list secondary skills in the title (e.g. if they are a .NET developer who knows Azure, the query is ".NET Developer", NOT "Azure .NET Developer").
+    - This query is used to fetch jobs, so it MUST exactly match standard job board titles for their core expertise.
     
     Return ONLY a valid JSON object with the following structure:
     {{
@@ -117,10 +133,10 @@ def extract_resume_details(resume_text: str, target_role: str = "") -> dict:
         "skills": ["Skill 1", "Skill 2"],
         "summary": "A brief 2-sentence summary of the candidate's profile.",
         "job_search_query": "The EXACT primary job title (e.g. '.NET Developer' or 'Senior Software Engineer'). DO NOT hallucinate titles based on secondary skills.",
-        "overall_ats_score": 45, // Be strict! An integer between 0 and 100.
+        "overall_ats_score": 45, // Be strict! An integer between 0 and 100 based on the rubric.
         "feedback_breakdown": [
-            "CRITICAL: Point out a major missing skill or keyword related to their domain.",
-            "WARNING: Point out a formatting issue or lack of metrics.",
+            "CRITICAL: Point out a major missing skill or metric related to their domain.",
+            "WARNING: Point out a formatting issue or lack of business impact.",
             "SUGGESTION: Tell them exactly what to add to improve the ATS score."
         ] // Exactly 3 strict, actionable sentences of feedback.
     }}
@@ -138,6 +154,7 @@ def extract_resume_details(resume_text: str, target_role: str = "") -> dict:
                 {"role": "user", "content": prompt},
             ],
             response_format={"type": "json_object"},
+            temperature=0.0,
         )
         content = response.choices[0].message.content.strip()
         
@@ -157,8 +174,11 @@ def extract_resume_details(resume_text: str, target_role: str = "") -> dict:
                 parsed["overall_ats_score"] = 70
             if "feedback_breakdown" not in parsed:
                 parsed["feedback_breakdown"] = ["Your resume looks good, but could use more specific metrics."]
+            _ats_cache[cache_key] = parsed
             return parsed
     except Exception as e:
         print(f"Error extracting resume details via LLM: {e}")
 
-    return _fallback_extract(resume_text, target_role)
+    result = _fallback_extract(resume_text, target_role)
+    _ats_cache[cache_key] = result
+    return result

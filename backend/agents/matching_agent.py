@@ -145,17 +145,34 @@ def match_jobs_to_resume(resume_details: dict, jobs: List[dict], top_k: int = 5)
 
 
 def fallback_match_jobs(resume_details: dict, jobs: List[dict], top_k: int = 10) -> List[Dict]:
-    """Simple skill-overlap scoring when vector search is unavailable."""
+    """Simple skill-overlap scoring when vector search is unavailable, with strict domain penalties."""
     skills = [s.lower() for s in resume_details.get("skills", []) if s]
     query = resume_details.get("job_search_query", "").lower()
     scored = []
 
+    # Get the core domain keyword (e.g. '.net' from '.net developer')
+    core_keyword = query.split()[0] if query else ""
+
     for i, job in enumerate(jobs):
-        text = f"{job.get('title', '')} {job.get('description', '')}".lower()
+        title = job.get('title', '').lower()
+        desc = job.get('description', '').lower()
+        text = f"{title} {desc}"
+        
         overlap = sum(1 for skill in skills if skill in text)
-        title_bonus = 0.3 if query and query in job.get("title", "").lower() else 0
-        score = min(1.0, (overlap / max(len(skills), 1)) + title_bonus)
-        scored.append({**job, "match_score": round(score, 4), "id": i})
+        
+        # Huge bonus for exact domain match in title, penalty for missing it
+        if core_keyword and core_keyword in title:
+            title_bonus = 0.5
+        elif core_keyword and core_keyword in desc:
+            title_bonus = 0.1
+        else:
+            title_bonus = -0.5 # Severe penalty if domain isn't even mentioned
+            
+        score = min(1.0, max(0.0, (overlap / max(len(skills), 1)) + title_bonus))
+        
+        # Only keep jobs with a score above 0
+        if score > 0:
+            scored.append({**job, "match_score": round(score, 4), "id": i})
 
     scored.sort(key=lambda item: item["match_score"], reverse=True)
     return scored[:top_k]

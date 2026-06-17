@@ -55,13 +55,26 @@ def find_job_matches(request: MatchRequest):
     )
 
     live_jobs = search_jobs(search_query, location=request.location, num_pages=1)
-    if not live_jobs:
-        # If no live jobs, return the ATS score anyway with an empty list
+    
+    # Strict Domain Filtering: 
+    # Only keep jobs that mention the core domain/search query in title or description.
+    filtered_jobs = []
+    domain_keywords = search_query.lower().split()
+    # If the query is a multi-word role like ".NET Developer", make sure at least the core tech is there.
+    core_keyword = domain_keywords[0] if domain_keywords else ""
+    
+    for job in live_jobs:
+        job_text = f"{job.get('title', '')} {job.get('description', '')}".lower()
+        if core_keyword and core_keyword in job_text:
+            filtered_jobs.append(job)
+            
+    if not filtered_jobs:
+        # If no live jobs passed the filter, return the ATS score anyway with an empty list
         matched_jobs = []
     else:
-        matched_jobs = match_jobs_to_resume(resume_details, live_jobs, top_k=15)
+        matched_jobs = match_jobs_to_resume(resume_details, filtered_jobs, top_k=15)
         if not matched_jobs:
-            matched_jobs = fallback_match_jobs(resume_details, live_jobs, top_k=15)
+            matched_jobs = fallback_match_jobs(resume_details, filtered_jobs, top_k=15)
 
     return {
         "jobs": matched_jobs,
