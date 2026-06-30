@@ -1,5 +1,5 @@
 node_modules/
-frontend/dist/
+# frontend/dist/ — committed so Railway backend can serve it without a Node build step
 __pycache__/
 .env
 *.env
