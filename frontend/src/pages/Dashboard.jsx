@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { CircularProgressbar } from 'react-circular-progressbar';
 import 'react-circular-progressbar/dist/styles.css';
 import { UploadCloud, Search, MapPin, Briefcase, ExternalLink, AlertCircle, CheckCircle2 } from 'lucide-react';
+import Chatbot from '../components/Chatbot';
 
 const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:8000';
 
@@ -128,6 +129,7 @@ const Dashboard = () => {
 
   return (
     <div className="animate-fade-in">
+      <Chatbot resumeText={resumeText} atsScore={atsScore} jobs={jobs} />
       <div className="hero-copy">
         <h1 className="heading-1">
           Your <span className="logo">Career Copilot</span>
