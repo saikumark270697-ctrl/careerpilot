@@ -2,11 +2,15 @@ import React, { useState } from 'react';
 import { CircularProgressbar } from 'react-circular-progressbar';
 import 'react-circular-progressbar/dist/styles.css';
 import { UploadCloud, Search, MapPin, Briefcase, ExternalLink, AlertCircle, CheckCircle2 } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import Chatbot from '../components/Chatbot';
+import { useAuth } from '../context/AuthContext';
 
 const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:8000';
 
 const Dashboard = () => {
+  const { user } = useAuth();
+  const navigate = useNavigate();
   const [resumeText, setResumeText] = useState('');
   const [targetRole, setTargetRole] = useState('');
   const [location, setLocation] = useState('remote');
@@ -129,7 +133,13 @@ const Dashboard = () => {
 
   return (
     <div className="animate-fade-in">
-      <Chatbot resumeText={resumeText} atsScore={atsScore} jobs={jobs} />
+      <Chatbot
+        resumeText={resumeText}
+        atsScore={atsScore}
+        jobs={jobs}
+        user={user}
+        onSignIn={(mode) => navigate(mode === 'signup' ? '/signup' : '/login')}
+      />
       <div className="hero-copy">
         <h1 className="heading-1">
           Your <span className="logo">Career Copilot</span>

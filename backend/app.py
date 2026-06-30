@@ -1,7 +1,8 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from database import engine, Base
-from routes import resume, jobs, match, chat
+import models  # noqa: F401 — ensures all tables register with Base before create_all
+from routes import resume, jobs, match, chat, auth
 import os
 import sys
 import asyncio
@@ -28,6 +29,7 @@ app.include_router(resume.router, prefix="/api/resume", tags=["Resume"])
 app.include_router(jobs.router, prefix="/api/jobs", tags=["Jobs"])
 app.include_router(match.router, prefix="/api/match", tags=["Match"])
 app.include_router(chat.router, prefix="/api/chat", tags=["Chat"])
+app.include_router(auth.router, prefix="/api/auth", tags=["Auth"])
 
 @app.get("/")
 def read_root():
