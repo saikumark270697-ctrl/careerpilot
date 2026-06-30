@@ -6,7 +6,7 @@ from typing import Optional
 import os
 from datetime import datetime, timedelta
 from jose import JWTError, jwt
-from passlib.context import CryptContext
+import bcrypt
 
 from database import get_db
 import models
@@ -17,8 +17,15 @@ SECRET_KEY = os.getenv("JWT_SECRET", "supersecretjwtkey_replace_in_prod")
 ALGORITHM = "HS256"
 TOKEN_EXPIRE_DAYS = 30
 
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/auth/login", auto_error=False)
+
+
+def _hash_pw(password: str) -> str:
+    return bcrypt.hashpw(password.encode(), bcrypt.gensalt()).decode()
+
+
+def _verify_pw(password: str, hashed: str) -> bool:
+    return bcrypt.checkpw(password.encode(), hashed.encode())
 
 
 def _create_token(user_id: int, email: str) -> str:
@@ -66,7 +73,7 @@ def register(req: RegisterRequest, db: Session = Depends(get_db)):
         raise HTTPException(status_code=400, detail="Email already registered. Please sign in.")
     if len(req.password) < 6:
         raise HTTPException(status_code=400, detail="Password must be at least 6 characters.")
-    hashed = pwd_context.hash(req.password)
+    hashed = _hash_pw(req.password)
     user = models.UserProfile(name=req.name.strip(), email=req.email.lower().strip(), hashed_password=hashed)
     db.add(user)
     db.commit()
@@ -77,7 +84,7 @@ def register(req: RegisterRequest, db: Session = Depends(get_db)):
 @router.post("/login")
 def login(req: LoginRequest, db: Session = Depends(get_db)):
     user = db.query(models.UserProfile).filter(models.UserProfile.email == req.email.lower().strip()).first()
-    if not user or not user.hashed_password or not pwd_context.verify(req.password, user.hashed_password):
+    if not user or not user.hashed_password or not _verify_pw(req.password, user.hashed_password):
         raise HTTPException(status_code=401, detail="Invalid email or password.")
     return {"token": _create_token(user.id, user.email), "user": _user_dict(user)}
 
