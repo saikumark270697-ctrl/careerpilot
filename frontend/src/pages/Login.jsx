@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { Rocket, Mail, Lock, Eye, EyeOff, AlertCircle, ArrowRight } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
-const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+const API_BASE = import.meta.env.VITE_API_URL || '';
 
 const Login = () => {
   const [email, setEmail] = useState('');

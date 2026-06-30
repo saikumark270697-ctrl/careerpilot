@@ -54,7 +54,16 @@ def find_job_matches(request: MatchRequest):
         or "software engineer"
     )
 
-    live_jobs = search_jobs(search_query, location=request.location, num_pages=1)
+    # Support multiple comma-separated locations
+    location_list = [l.strip() for l in request.location.split(',') if l.strip()] or ['Remote']
+    live_jobs = []
+    seen_keys = set()
+    for loc in location_list[:3]:  # max 3 locations to stay within rate limits
+        for job in search_jobs(search_query, location=loc, num_pages=1):
+            key = f"{job.get('title','').lower()}-{job.get('company','').lower()}"
+            if key not in seen_keys:
+                seen_keys.add(key)
+                live_jobs.append(job)
     
     # Strict Domain Filtering: 
     # Only keep jobs that mention the core domain/search query in title or description.

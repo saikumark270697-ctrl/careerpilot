@@ -1,19 +1,81 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { CircularProgressbar } from 'react-circular-progressbar';
 import 'react-circular-progressbar/dist/styles.css';
-import { UploadCloud, Search, MapPin, Briefcase, ExternalLink, AlertCircle, CheckCircle2 } from 'lucide-react';
+import { UploadCloud, Search, MapPin, Briefcase, ExternalLink, AlertCircle, CheckCircle2, X as XIcon, Plus } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import Chatbot from '../components/Chatbot';
 import { useAuth } from '../context/AuthContext';
 
-const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+const LOCATION_PRESETS = [
+  'Remote', 'Hyderabad', 'Bangalore', 'Delhi', 'Mumbai',
+  'Chennai', 'Pune', 'Kolkata', 'Noida', 'Gurgaon',
+  'USA', 'UK', 'Canada', 'Singapore', 'Australia',
+];
+
+const LocationPicker = ({ locations, onChange }) => {
+  const [inputVal, setInputVal] = useState('');
+  const inputRef = useRef(null);
+
+  const add = (loc) => {
+    const clean = loc.trim();
+    if (clean && !locations.includes(clean)) onChange([...locations, clean]);
+    setInputVal('');
+    inputRef.current?.focus();
+  };
+
+  const remove = (loc) => onChange(locations.filter(l => l !== loc));
+
+  const handleKey = (e) => {
+    if ((e.key === 'Enter' || e.key === ',') && inputVal.trim()) {
+      e.preventDefault();
+      add(inputVal);
+    } else if (e.key === 'Backspace' && !inputVal && locations.length) {
+      remove(locations[locations.length - 1]);
+    }
+  };
+
+  const suggestions = LOCATION_PRESETS.filter(
+    p => !locations.includes(p) && p.toLowerCase().includes(inputVal.toLowerCase())
+  );
+
+  return (
+    <div className="loc-picker">
+      <div className="loc-tags-wrap" onClick={() => inputRef.current?.focus()}>
+        <MapPin size={16} className="loc-icon" />
+        {locations.map(loc => (
+          <span key={loc} className="loc-tag">
+            {loc}
+            <button className="loc-tag-remove" onClick={e => { e.stopPropagation(); remove(loc); }}><XIcon size={11} /></button>
+          </span>
+        ))}
+        <input
+          ref={inputRef}
+          className="loc-tag-input"
+          placeholder={locations.length === 0 ? 'Add locations…' : ''}
+          value={inputVal}
+          onChange={e => setInputVal(e.target.value)}
+          onKeyDown={handleKey}
+        />
+      </div>
+      <div className="loc-presets">
+        {suggestions.slice(0, 8).map(p => (
+          <button key={p} className="loc-preset-chip" onClick={() => add(p)}>
+            <Plus size={10} /> {p}
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+};
+
+const API_BASE = import.meta.env.VITE_API_URL || '';
 
 const Dashboard = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
   const [resumeText, setResumeText] = useState('');
   const [targetRole, setTargetRole] = useState('');
-  const [location, setLocation] = useState('remote');
+  const [locations, setLocations] = useState(['Remote']);
   const [isProcessing, setIsProcessing] = useState(false);
   const [jobs, setJobs] = useState([]);
   const [atsScore, setAtsScore] = useState(null);
@@ -110,7 +172,7 @@ const Dashboard = () => {
       const response = await fetch(`${API_BASE}/api/match/find`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ resume_text: resumeText, target_role: targetRole, location: location }),
+        body: JSON.stringify({ resume_text: resumeText, target_role: targetRole, location: locations.join(', ') || 'Remote' }),
       });
 
       const data = await response.json();
@@ -170,17 +232,8 @@ const Dashboard = () => {
             </div>
 
             <div className="form-field">
-              <label className="body-text-bold">Location</label>
-              <div className="input-shell">
-                <MapPin size={18} />
-                <input 
-                  type="text" 
-                  className="glass-input" 
-                  placeholder="e.g. Remote, New York" 
-                  value={location}
-                  onChange={(e) => setLocation(e.target.value)}
-                />
-              </div>
+              <label className="body-text-bold">Locations <span style={{color:'var(--text-3)',fontWeight:400,fontSize:'0.8rem'}}>(add multiple)</span></label>
+              <LocationPicker locations={locations} onChange={setLocations} />
             </div>
 
             <div className="upload-row">
