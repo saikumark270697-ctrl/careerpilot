@@ -203,12 +203,14 @@ const Dashboard = () => {
         onSignIn={(mode) => navigate(mode === 'signup' ? '/signup' : '/login')}
       />
       <div className="hero-copy">
+        <div className="hero-badge">⚡ Powered by Groq · Llama 3.3 · Ultra-fast AI</div>
         <h1 className="heading-1">
           Your <span className="logo">Career Copilot</span>
         </h1>
         <p className="hero-subtitle">
-          Upload your resume, specify your target role, and let our AI evaluate your ATS score while fetching the perfect live job matches.
+          Upload your resume, get your ATS score, find live job matches, and let SRI — your AI career assistant — guide you to your next role.
         </p>
+        <div className="hero-divider" />
       </div>
       
       <div className="dashboard-grid">
