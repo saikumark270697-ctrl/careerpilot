@@ -202,15 +202,32 @@ const Dashboard = () => {
         user={user}
         onSignIn={(mode) => navigate(mode === 'signup' ? '/signup' : '/login')}
       />
-      <div className="hero-copy">
+      <div className="hero-section">
         <div className="hero-badge">⚡ Powered by Groq · Llama 3.3 · Ultra-fast AI</div>
         <h1 className="heading-1">
           Your <span className="logo">Career Copilot</span>
         </h1>
         <p className="hero-subtitle">
-          Upload your resume, get your ATS score, find live job matches, and let SRI — your AI career assistant — guide you to your next role.
+          Upload your resume, get your ATS score, find live job matches, and let <strong>SRI</strong> — your AI career assistant — guide you to your next role.
         </p>
-        <div className="hero-divider" />
+        <div className="hero-stats">
+          <div className="hero-stat">
+            <span className="hero-stat-n">50K+</span>
+            <span className="hero-stat-label">Jobs Daily</span>
+          </div>
+          <div className="hero-stat">
+            <span className="hero-stat-n">ATS</span>
+            <span className="hero-stat-label">Optimized</span>
+          </div>
+          <div className="hero-stat">
+            <span className="hero-stat-n">AI</span>
+            <span className="hero-stat-label">Powered</span>
+          </div>
+          <div className="hero-stat">
+            <span className="hero-stat-n">Free</span>
+            <span className="hero-stat-label">To Start</span>
+          </div>
+        </div>
       </div>
       
       <div className="dashboard-grid">
