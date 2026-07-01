@@ -11,18 +11,22 @@ def get_cache_key(resume_text: str, target_role: str) -> str:
     return hashlib.md5(key_str.encode("utf-8")).hexdigest()
 
 def _get_client():
-    # Try OpenRouter first, then fallback to Groq
-    openrouter_key = os.getenv("OPENROUTER_API_KEY")
+    groq_key = os.getenv("GROQ_API_KEY", "").strip()
+    if groq_key:
+        return OpenAI(
+            base_url="https://api.groq.com/openai/v1",
+            api_key=groq_key,
+        ), "llama-3.3-70b-versatile"
+
+    openrouter_key = os.getenv("OPENROUTER_API_KEY", "").strip()
     if openrouter_key:
         return OpenAI(
             base_url="https://openrouter.ai/api/v1",
             api_key=openrouter_key,
-        )
-    
-    # Fallback to Groq if OpenRouter is missing
-    return OpenAI(
-        base_url="https://api.groq.com/openai/v1",
-        api_key=os.getenv("GROQ_API_KEY", "dummy_key"),
+        ), "meta-llama/llama-3.1-8b-instruct"
+
+    raise ValueError(
+        "No API key configured. Set GROQ_API_KEY in Railway environment variables."
     )
 
 JOB_TITLES = [
@@ -146,8 +150,8 @@ def extract_resume_details(resume_text: str, target_role: str = "") -> dict:
     """
 
     try:
-        model_name = "meta-llama/llama-3.1-8b-instruct" if os.getenv("OPENROUTER_API_KEY") else "llama-3.1-8b-instant"
-        response = _get_client().chat.completions.create(
+        client, model_name = _get_client()
+        response = client.chat.completions.create(
             model=model_name,
             messages=[
                 {"role": "system", "content": "You are a helpful assistant that outputs ONLY valid JSON, with no markdown formatting or extra text."},

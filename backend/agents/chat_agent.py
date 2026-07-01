@@ -1,7 +1,7 @@
 import os
 from openai import OpenAI
 
-SYSTEM_PROMPT = """You are CareerBot, an expert AI career assistant built into Career Copilot. You help users with every step of their job search journey:
+SYSTEM_PROMPT = """You are SRI, an expert AI career assistant built into Career Copilot. You help users with every step of their job search journey.
 
 **Your Capabilities:**
 1. **Resume Review** – Detailed ATS analysis, formatting issues, missing keywords, impact metrics
@@ -25,21 +25,23 @@ You have context about the user's resume, ATS score, and current job matches whe
 
 
 def _get_groq_client():
-    groq_key = os.getenv("GROQ_API_KEY")
+    groq_key = os.getenv("GROQ_API_KEY", "").strip()
     if groq_key:
         return OpenAI(
             base_url="https://api.groq.com/openai/v1",
             api_key=groq_key,
         ), "llama-3.3-70b-versatile"
 
-    openrouter_key = os.getenv("OPENROUTER_API_KEY")
+    openrouter_key = os.getenv("OPENROUTER_API_KEY", "").strip()
     if openrouter_key:
         return OpenAI(
             base_url="https://openrouter.ai/api/v1",
             api_key=openrouter_key,
         ), "meta-llama/llama-3.3-70b-instruct"
 
-    raise ValueError("No GROQ_API_KEY or OPENROUTER_API_KEY found in environment.")
+    raise ValueError(
+        "No API key configured. Set GROQ_API_KEY in Railway environment variables."
+    )
 
 
 def chat_with_bot(

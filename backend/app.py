@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, JSONResponse
 from database import engine, Base
 import models  # noqa: F401 — ensures all tables register with Base before create_all
 from routes import resume, jobs, match, chat, auth
@@ -31,6 +31,26 @@ app.include_router(jobs.router, prefix="/api/jobs", tags=["Jobs"])
 app.include_router(match.router, prefix="/api/match", tags=["Match"])
 app.include_router(chat.router, prefix="/api/chat", tags=["Chat"])
 app.include_router(auth.router, prefix="/api/auth", tags=["Auth"])
+
+
+@app.get("/api/health", tags=["Health"])
+def health_check():
+    groq_key = os.getenv("GROQ_API_KEY", "").strip()
+    openrouter_key = os.getenv("OPENROUTER_API_KEY", "").strip()
+    db_url = os.getenv("DATABASE_URL", "").strip()
+
+    status = {
+        "status": "ok",
+        "groq_api_key": "set" if groq_key else "MISSING",
+        "openrouter_api_key": "set" if openrouter_key else "not set",
+        "database_url": "set" if db_url else "MISSING",
+        "ai_provider": "groq" if groq_key else ("openrouter" if openrouter_key else "NONE"),
+    }
+
+    if not groq_key and not openrouter_key:
+        return JSONResponse(status_code=503, content={**status, "status": "degraded", "error": "No LLM API key set"})
+
+    return status
 
 # Serve built React frontend (production only — not present locally)
 _frontend_dist = os.path.join(os.path.dirname(__file__), '..', 'frontend', 'dist')
