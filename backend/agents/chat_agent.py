@@ -54,8 +54,23 @@ def chat_with_bot(
 
     system_content = SYSTEM_PROMPT
 
-    if resume_text and resume_text.strip():
+    has_resume = bool(resume_text and resume_text.strip())
+
+    if has_resume:
         system_content += f"\n\n---\n**USER'S UPLOADED RESUME:**\n{resume_text.strip()[:4000]}"
+    else:
+        system_content += (
+            "\n\n---\n**IMPORTANT — NO RESUME PROVIDED:**\n"
+            "The user has NOT uploaded or pasted a resume. You do NOT know their name, "
+            "work history, skills, experience level, or target role.\n"
+            "You MUST NOT invent, assume, or fabricate any of these details.\n"
+            "If they ask for a resume review, ATS analysis, skill-gap analysis, a personalized "
+            "30-day plan, job matching, cover letter, or anything that depends on their background, "
+            "do NOT produce a made-up answer. Instead, briefly explain you need their resume first "
+            "and ask them to upload a file or paste their resume text into the dashboard (and optionally "
+            "state their target role). You MAY still answer genuinely general career questions "
+            "(e.g. 'how do I prepare for a behavioral interview?') without a resume."
+        )
 
     if ats_score is not None:
         system_content += f"\n\n**User's Current ATS Score:** {ats_score}/100"
