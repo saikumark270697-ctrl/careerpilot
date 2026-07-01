@@ -30,6 +30,7 @@ class ChatResponse(BaseModel):
 
 
 @router.post("/", response_model=ChatResponse)
+@router.post("", response_model=ChatResponse, include_in_schema=False)
 def chat(request: ChatRequest):
     if not request.messages:
         raise HTTPException(status_code=400, detail="Messages list is required.")

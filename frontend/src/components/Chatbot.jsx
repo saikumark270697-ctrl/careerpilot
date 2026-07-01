@@ -166,7 +166,7 @@ const ChatbotInner = ({ resumeText, atsScore, jobs, user, onSignIn }) => {
 
     try {
       const token = localStorage.getItem('sri_token');
-      const res = await fetch(`${API_BASE}/api/chat`, {
+      const res = await fetch(`${API_BASE}/api/chat/`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

@@ -17,6 +17,19 @@ Base.metadata.create_all(bind=engine)
 
 app = FastAPI(title="Career Copilot API")
 
+
+@app.middleware("http")
+async def honor_forwarded_proto(request, call_next):
+    """Railway terminates TLS at the edge and forwards plain HTTP internally.
+    Without this, FastAPI's automatic trailing-slash redirects point to http://,
+    which browsers block as an HTTPS->HTTP downgrade ("Failed to fetch").
+    Trust the x-forwarded-proto header so any redirect keeps the https scheme."""
+    proto = request.headers.get("x-forwarded-proto")
+    if proto:
+        request.scope["scheme"] = proto
+    return await call_next(request)
+
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
