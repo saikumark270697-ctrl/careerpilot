@@ -3,9 +3,14 @@ import requests
 from typing import List
 import concurrent.futures
 
-RAPIDAPI_KEY = os.getenv("RAPIDAPI_KEY")
+RAPIDAPI_KEY = os.getenv("RAPIDAPI_KEY", "").strip()
 
 def _fetch_jobs(query: str, location: str, num_pages: int, platform: str) -> List[dict]:
+    if not RAPIDAPI_KEY:
+        raise ValueError(
+            "Job search API key not configured. Set RAPIDAPI_KEY in Railway environment variables. "
+            "Get a free key at rapidapi.com/api/jsearch (JSearch API)."
+        )
     url = "https://jsearch.p.rapidapi.com/search"
     
     if platform == "LinkedIn":

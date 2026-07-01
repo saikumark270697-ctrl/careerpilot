@@ -58,12 +58,17 @@ def find_job_matches(request: MatchRequest):
     location_list = [l.strip() for l in request.location.split(',') if l.strip()] or ['Remote']
     live_jobs = []
     seen_keys = set()
-    for loc in location_list[:3]:  # max 3 locations to stay within rate limits
-        for job in search_jobs(search_query, location=loc, num_pages=1):
-            key = f"{job.get('title','').lower()}-{job.get('company','').lower()}"
-            if key not in seen_keys:
-                seen_keys.add(key)
-                live_jobs.append(job)
+    try:
+        for loc in location_list[:3]:  # max 3 locations to stay within rate limits
+            for job in search_jobs(search_query, location=loc, num_pages=1):
+                key = f"{job.get('title','').lower()}-{job.get('company','').lower()}"
+                if key not in seen_keys:
+                    seen_keys.add(key)
+                    live_jobs.append(job)
+    except ValueError as e:
+        raise HTTPException(status_code=503, detail=str(e))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Job search error: {str(e)}")
     
     # Soft Domain Filtering:
     # Try to filter by keywords, but if it removes everything, relax and use all results.
