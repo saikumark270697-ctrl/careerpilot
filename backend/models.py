@@ -16,6 +16,18 @@ class UserProfile(Base):
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
 
+class EmailLoginCode(Base):
+    __tablename__ = "email_login_codes"
+
+    id = Column(Integer, primary_key=True, index=True)
+    email = Column(String, index=True, nullable=False)
+    name = Column(String, nullable=True)
+    code_hash = Column(String, nullable=False)
+    attempts = Column(Integer, default=0)
+    expires_at = Column(DateTime(timezone=True), nullable=False)
+    consumed_at = Column(DateTime(timezone=True), nullable=True)
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+
 class JobListing(Base):
     __tablename__ = "job_listings"
 
@@ -37,4 +49,3 @@ class AppliedJob(Base):
     job_url = Column(String, nullable=False)
     status = Column(String, default="REQUIRES_MANUAL_ACTION") # SUCCESS, FAILED, REQUIRES_MANUAL_ACTION
     applied_at = Column(DateTime(timezone=True), server_default=func.now())
-
