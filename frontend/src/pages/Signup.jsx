@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, Navigate, useNavigate } from 'react-router-dom';
 import { Rocket, User, Mail, Lock, Eye, EyeOff, AlertCircle, Sparkles } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
@@ -12,7 +12,7 @@ const Signup = () => {
   const [showPw, setShowPw] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  const { login } = useAuth();
+  const { user, loading: authLoading, login } = useAuth();
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
@@ -30,7 +30,7 @@ const Signup = () => {
       const data = await res.json();
       if (!res.ok) throw new Error(data.detail || 'Registration failed.');
       login(data.user, data.token);
-      navigate('/');
+      navigate('/dashboard', { replace: true });
     } catch (err) {
       setError(err.message);
     } finally {
@@ -42,11 +42,21 @@ const Signup = () => {
   const strengthLabel = ['', 'Weak', 'Good', 'Strong'];
   const strengthColor = ['', '#f87171', '#f59e0b', '#10b981'];
 
+  if (authLoading) {
+    return (
+      <div className="auth-page">
+        <div className="route-loader">
+          <span className="auth-spinner" />
+          <span>Checking your session...</span>
+        </div>
+      </div>
+    );
+  }
+
+  if (user) return <Navigate to="/dashboard" replace />;
+
   return (
     <div className="auth-page">
-      <div className="auth-orb auth-orb-1" />
-      <div className="auth-orb auth-orb-2" />
-
       <div className="auth-card">
         <Link to="/" className="auth-brand">
           <Rocket size={26} className="auth-brand-icon" />
@@ -55,7 +65,7 @@ const Signup = () => {
 
         <div className="auth-header">
           <h1 className="auth-title">Create your account</h1>
-          <p className="auth-subtitle">Start your job search journey with <strong>SRI</strong> — free forever</p>
+          <p className="auth-subtitle">Start your job search journey with <strong>SRI</strong> - free forever</p>
         </div>
 
         {error && (
@@ -114,7 +124,7 @@ const Signup = () => {
             {password && (
               <div className="pw-strength">
                 <div className="pw-bar">
-                  {[1,2,3].map(l => (
+                  {[1, 2, 3].map(l => (
                     <div key={l} className="pw-segment" style={{ background: strength >= l ? strengthColor[strength] : 'rgba(255,255,255,0.08)' }} />
                   ))}
                 </div>
@@ -130,7 +140,7 @@ const Signup = () => {
 
         <p className="auth-switch">
           Already have an account?{' '}
-          <Link to="/login" className="auth-link">Sign in →</Link>
+          <Link to="/login" className="auth-link">Sign in</Link>
         </p>
 
         <p className="auth-terms">

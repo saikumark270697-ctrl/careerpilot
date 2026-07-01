@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, Navigate, useLocation, useNavigate } from 'react-router-dom';
 import { Rocket, Mail, Lock, Eye, EyeOff, AlertCircle, ArrowRight } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
@@ -11,8 +11,10 @@ const Login = () => {
   const [showPw, setShowPw] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  const { login } = useAuth();
+  const { user, loading: authLoading, login } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
+  const from = location.state?.from?.pathname || '/dashboard';
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -28,7 +30,7 @@ const Login = () => {
       const data = await res.json();
       if (!res.ok) throw new Error(data.detail || 'Login failed.');
       login(data.user, data.token);
-      navigate('/');
+      navigate(from, { replace: true });
     } catch (err) {
       setError(err.message);
     } finally {
@@ -36,14 +38,22 @@ const Login = () => {
     }
   };
 
+  if (authLoading) {
+    return (
+      <div className="auth-page">
+        <div className="route-loader">
+          <span className="auth-spinner" />
+          <span>Checking your session...</span>
+        </div>
+      </div>
+    );
+  }
+
+  if (user) return <Navigate to="/dashboard" replace />;
+
   return (
     <div className="auth-page">
-      {/* Background orbs */}
-      <div className="auth-orb auth-orb-1" />
-      <div className="auth-orb auth-orb-2" />
-
       <div className="auth-card">
-        {/* Logo */}
         <Link to="/" className="auth-brand">
           <Rocket size={26} className="auth-brand-icon" />
           <span className="auth-brand-name">Career Copilot</span>
@@ -106,15 +116,15 @@ const Login = () => {
 
         <p className="auth-switch">
           Don't have an account?{' '}
-          <Link to="/signup" className="auth-link">Create one free →</Link>
+          <Link to="/signup" className="auth-link">Create one free</Link>
         </p>
 
         <div className="auth-divider"><span>What you'll unlock</span></div>
         <ul className="auth-perks">
-          <li>📋 Full resume analysis & ATS scoring</li>
-          <li>💼 Unlimited SRI chat with personalized advice</li>
-          <li>🔍 Live job matching across LinkedIn, Naukri & more</li>
-          <li>💻 Interview prep, coding help & cover letters</li>
+          <li>Full resume analysis and ATS scoring</li>
+          <li>Unlimited SRI chat with personalized advice</li>
+          <li>Live job matching across LinkedIn, Naukri and more</li>
+          <li>Interview prep, coding help and cover letters</li>
         </ul>
       </div>
     </div>

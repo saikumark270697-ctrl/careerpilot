@@ -1,6 +1,6 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route, Link, useNavigate } from 'react-router-dom';
-import { Rocket, LogIn, UserPlus, LogOut, ChevronDown, HelpCircle } from 'lucide-react';
+import { BrowserRouter as Router, Routes, Route, Link, Navigate, useLocation, useNavigate } from 'react-router-dom';
+import { Rocket, LogIn, UserPlus, LogOut, ChevronDown } from 'lucide-react';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import Dashboard from './pages/Dashboard';
 import Login from './pages/Login';
@@ -13,8 +13,11 @@ import ForgotPassword from './pages/ForgotPassword';
 function Nav() {
   const { user, logout, loading } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
   const [menuOpen, setMenuOpen] = React.useState(false);
   const menuRef = React.useRef(null);
+  const isLoginPage = location.pathname === '/login';
+  const isSignupPage = location.pathname === '/signup';
 
   React.useEffect(() => {
     const handler = (e) => { if (menuRef.current && !menuRef.current.contains(e.target)) setMenuOpen(false); };
@@ -22,17 +25,17 @@ function Nav() {
     return () => document.removeEventListener('mousedown', handler);
   }, []);
 
-  const handleLogout = () => { logout(); setMenuOpen(false); navigate('/'); };
+  const handleLogout = () => { logout(); setMenuOpen(false); navigate('/login'); };
 
   return (
     <nav className="glass-nav">
-      <Link to="/" className="brand">
+      <Link to={user ? '/dashboard' : '/login'} className="brand">
         <Rocket size={24} />
         <span className="logo">Career Copilot</span>
       </Link>
 
       <div className="nav-right">
-        <Link to="/" className="nav-link">Dashboard</Link>
+        {user && <Link to="/dashboard" className="nav-link">Dashboard</Link>}
         <Link to="/faq" className="nav-link">FAQ</Link>
 
         {loading ? (
@@ -58,12 +61,16 @@ function Nav() {
           </div>
         ) : (
           <div className="nav-auth-btns">
-            <Link to="/login" className="nav-login-btn">
-              <LogIn size={15} /> Sign In
-            </Link>
-            <Link to="/signup" className="nav-signup-btn">
-              <UserPlus size={15} /> Get Started
-            </Link>
+            {!isLoginPage && (
+              <Link to="/login" className="nav-login-btn">
+                <LogIn size={15} /> Sign In
+              </Link>
+            )}
+            {!isSignupPage && (
+              <Link to="/signup" className="nav-signup-btn">
+                <UserPlus size={15} /> Get Started
+              </Link>
+            )}
           </div>
         )}
       </div>
@@ -74,6 +81,7 @@ function Nav() {
 // ─── Footer ───────────────────────────────────────────────────────────────────
 
 function Footer() {
+  const { user } = useAuth();
   return (
     <footer className="site-footer">
       <div className="footer-inner">
@@ -82,10 +90,10 @@ function Footer() {
           <span className="footer-name">Career Copilot</span>
         </div>
         <div className="footer-links">
-          <Link to="/" className="footer-link">Dashboard</Link>
+          {user && <Link to="/dashboard" className="footer-link">Dashboard</Link>}
           <Link to="/faq" className="footer-link">FAQ</Link>
-          <Link to="/login" className="footer-link">Sign In</Link>
-          <Link to="/signup" className="footer-link">Get Started</Link>
+          {!user && <Link to="/login" className="footer-link">Sign In</Link>}
+          {!user && <Link to="/signup" className="footer-link">Get Started</Link>}
         </div>
         <p className="footer-copy">
           © 2025 Career Copilot · Powered by Groq + Llama 3.3 · Built for job seekers worldwide
@@ -97,13 +105,37 @@ function Footer() {
 
 // ─── App ─────────────────────────────────────────────────────────────────────
 
+function RouteLoader() {
+  return (
+    <div className="route-loader">
+      <div className="loading-spinner" />
+      <span>Checking your session...</span>
+    </div>
+  );
+}
+
+function HomeRedirect() {
+  const { user, loading } = useAuth();
+  if (loading) return <RouteLoader />;
+  return <Navigate to={user ? '/dashboard' : '/login'} replace />;
+}
+
+function RequireAuth({ children }) {
+  const { user, loading } = useAuth();
+  const location = useLocation();
+  if (loading) return <RouteLoader />;
+  if (!user) return <Navigate to="/login" replace state={{ from: location }} />;
+  return children;
+}
+
 function AppInner() {
   return (
     <div className="app-container">
       <Nav />
       <main className="main-content">
         <Routes>
-          <Route path="/" element={<Dashboard />} />
+          <Route path="/" element={<HomeRedirect />} />
+          <Route path="/dashboard" element={<RequireAuth><Dashboard /></RequireAuth>} />
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
           <Route path="/faq" element={<FAQ />} />

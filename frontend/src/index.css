@@ -385,7 +385,8 @@ textarea.glass-input:focus { border-color: var(--p); box-shadow: 0 0 0 3px rgba(
 .loc-preset-chip:hover { background: rgba(99,102,241,.1); border-color: rgba(99,102,241,.28); color: #c4b5fd; }
 
 /* ── AUTH PAGES ──────────────────────────────────────── */
-.auth-page { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 24px; position: relative; overflow: hidden; background: var(--bg); }
+.auth-page { min-height: calc(100vh - 174px); display: flex; align-items: center; justify-content: center; padding: 32px 24px; position: relative; overflow: hidden; background: var(--bg); }
+.route-loader { min-height: 260px; display: flex; align-items: center; justify-content: center; gap: 12px; color: var(--t2); font-size: 13px; }
 .auth-orb { position: absolute; border-radius: 50%; filter: blur(100px); pointer-events: none; }
 .auth-orb-1 { width: 500px; height: 500px; background: radial-gradient(circle, rgba(99,102,241,.16) 0%, transparent 70%); top: -130px; left: -130px; }
 .auth-orb-2 { width: 420px; height: 420px; background: radial-gradient(circle, rgba(168,85,247,.12) 0%, transparent 70%); bottom: -100px; right: -80px; }
