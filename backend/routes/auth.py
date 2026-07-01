@@ -89,7 +89,13 @@ def _send_otp_email(email: str, code: str):
             """,
         })
     except Exception as exc:
-        raise HTTPException(status_code=502, detail=f"Could not send login code: {exc}")
+        # Log the real reason server-side (e.g. Resend test-mode recipient restriction)
+        # but never leak it to end users — show a clean, professional message.
+        print(f"[otp] Resend send failed for {email}: {exc}")
+        raise HTTPException(
+            status_code=502,
+            detail="We couldn't email a login code to this address right now. Please sign in with your password instead.",
+        )
 
 
 def get_current_user_optional(token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)):
