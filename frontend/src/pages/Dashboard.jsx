@@ -1,8 +1,8 @@
 import React, { useState, useRef } from 'react';
 import { CircularProgressbar } from 'react-circular-progressbar';
 import 'react-circular-progressbar/dist/styles.css';
-import { UploadCloud, Search, MapPin, Briefcase, ExternalLink, AlertCircle, CheckCircle2, X as XIcon, Plus } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { UploadCloud, Search, MapPin, Briefcase, ExternalLink, AlertCircle, CheckCircle2, X as XIcon, Plus, Rocket, Zap, Bot, Shield } from 'lucide-react';
+import { Link, useNavigate } from 'react-router-dom';
 import Chatbot from '../components/Chatbot';
 import { useAuth } from '../context/AuthContext';
 
@@ -73,6 +73,7 @@ const API_BASE = import.meta.env.VITE_API_URL || '';
 const Dashboard = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
+  const uploadRef = useRef(null);
   const [resumeText, setResumeText] = useState('');
   const [targetRole, setTargetRole] = useState('');
   const [locations, setLocations] = useState(['Remote']);
@@ -91,21 +92,20 @@ const Dashboard = () => {
     const now = new Date();
     const seconds = Math.floor((now - date) / 1000);
     let interval = seconds / 31536000;
-    if (interval >= 1) return Math.floor(interval) + " years ago";
+    if (interval >= 1) return Math.floor(interval) + 'y ago';
     interval = seconds / 2592000;
-    if (interval >= 1) return Math.floor(interval) + " months ago";
+    if (interval >= 1) return Math.floor(interval) + 'mo ago';
     interval = seconds / 86400;
-    if (interval >= 1) return Math.floor(interval) + " days ago";
+    if (interval >= 1) return Math.floor(interval) + 'd ago';
     interval = seconds / 3600;
-    if (interval >= 1) return Math.floor(interval) + " hours ago";
+    if (interval >= 1) return Math.floor(interval) + 'h ago';
     interval = seconds / 60;
-    if (interval >= 1) return Math.floor(interval) + " minutes ago";
-    return Math.floor(seconds) + " seconds ago";
+    if (interval >= 1) return Math.floor(interval) + 'm ago';
+    return 'just now';
   };
 
   const handleAutoApply = async (jobId, jobUrl) => {
     if (!jobUrl || !resumeText) return;
-    
     setApplyingJobs(prev => ({ ...prev, [jobId]: true }));
     try {
       const response = await fetch(`${API_BASE}/api/match/auto-apply`, {
@@ -115,18 +115,11 @@ const Dashboard = () => {
       });
       const data = await response.json();
       if (response.ok && data.status === 'success') {
-        if (data.message && data.message.includes("manual review")) {
-          setAppliedJobs(prev => ({ ...prev, [jobId]: 'manual' }));
-        } else {
-          setAppliedJobs(prev => ({ ...prev, [jobId]: 'success' }));
-        }
+        setAppliedJobs(prev => ({ ...prev, [jobId]: data.message?.includes('manual') ? 'manual' : 'success' }));
       } else {
-        alert('Auto-apply encountered an issue (e.g. CAPTCHA or missing fields). Routing to manual apply.');
         setAppliedJobs(prev => ({ ...prev, [jobId]: 'manual' }));
       }
-    } catch (err) {
-      console.error('Auto-apply error:', err);
-      alert('Auto-apply failed. Routing to manual apply.');
+    } catch {
       setAppliedJobs(prev => ({ ...prev, [jobId]: 'manual' }));
     } finally {
       setApplyingJobs(prev => ({ ...prev, [jobId]: false }));
@@ -135,29 +128,20 @@ const Dashboard = () => {
 
   const handleFileUpload = async (e) => {
     const file = e.target.files[0];
-    if (file) {
-      setIsProcessing(true);
-      setError('');
-      const formData = new FormData();
-      formData.append('file', file);
-      
-      try {
-        const response = await fetch(`${API_BASE}/api/resume/upload`, {
-          method: 'POST',
-          body: formData,
-        });
-        const data = await response.json();
-        if (response.ok) {
-          setResumeText(data.text);
-        } else {
-          alert(data.detail || 'Failed to process file');
-        }
-      } catch (uploadError) {
-        console.error('Upload error:', uploadError);
-        alert('Error uploading file. Make sure backend server is running.');
-      } finally {
-        setIsProcessing(false);
-      }
+    if (!file) return;
+    setIsProcessing(true);
+    setError('');
+    const formData = new FormData();
+    formData.append('file', file);
+    try {
+      const response = await fetch(`${API_BASE}/api/resume/upload`, { method: 'POST', body: formData });
+      const data = await response.json();
+      if (response.ok) setResumeText(data.text);
+      else alert(data.detail || 'Failed to process file');
+    } catch {
+      alert('Error uploading file. Make sure the backend is running.');
+    } finally {
+      setIsProcessing(false);
     }
   };
 
@@ -167,16 +151,13 @@ const Dashboard = () => {
     setJobs([]);
     setAtsScore(null);
     setFeedback([]);
-
     try {
       const response = await fetch(`${API_BASE}/api/match/find`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ resume_text: resumeText, target_role: targetRole, location: locations.join(', ') || 'Remote' }),
       });
-
       const data = await response.json();
-
       if (response.ok) {
         setJobs(data.jobs.map((job, index) => ({ ...job, id: job.id ?? index })));
         setSearchQuery(data.search_query);
@@ -185,9 +166,8 @@ const Dashboard = () => {
       } else {
         setError(data.detail || 'Failed to find job matches.');
       }
-    } catch (analyzeError) {
-      console.error('Match error:', analyzeError);
-      setError('Could not reach the backend. Make sure the server is running on port 8000.');
+    } catch {
+      setError('Could not reach the backend. Please try again.');
     } finally {
       setIsProcessing(false);
     }
@@ -202,14 +182,30 @@ const Dashboard = () => {
         user={user}
         onSignIn={(mode) => navigate(mode === 'signup' ? '/signup' : '/login')}
       />
+
+      {/* ── Hero ─────────────────────────────────────── */}
       <div className="hero-section">
-        <div className="hero-badge">⚡ Powered by Groq · Llama 3.3 · Ultra-fast AI</div>
+        <div className="hero-badge">
+          <Zap size={12} /> Powered by Groq · Llama 3.3 · Ultra-fast AI
+        </div>
         <h1 className="heading-1">
-          Your <span className="logo">Career Copilot</span>
+          Your <span className="hero-grad">Career Copilot</span>
         </h1>
         <p className="hero-subtitle">
-          Upload your resume, get your ATS score, find live job matches, and let <strong>SRI</strong> — your AI career assistant — guide you to your next role.
+          Upload your resume, get your ATS score, find live job matches, and let{' '}
+          <strong>SRI</strong> — your AI career assistant — guide you to your next role.
         </p>
+        <div className="hero-cta-row">
+          <button
+            className="hero-cta-primary"
+            onClick={() => uploadRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })}
+          >
+            <UploadCloud size={16} /> Analyze My Resume
+          </button>
+          <Link to="/faq" className="hero-cta-secondary">
+            How it works →
+          </Link>
+        </div>
         <div className="hero-stats">
           <div className="hero-stat">
             <span className="hero-stat-n">50K+</span>
@@ -229,21 +225,22 @@ const Dashboard = () => {
           </div>
         </div>
       </div>
-      
-      <div className="dashboard-grid">
-        {/* Left Column: Inputs & Score */}
+
+      {/* ── Main Grid ─────────────────────────────────── */}
+      <div className="dashboard-grid" ref={uploadRef}>
+        {/* Left: Inputs & Score */}
         <div className="panel-stack">
           <div className="card glass-panel">
-            <h2 className="heading-2"><UploadCloud className="title-icon" size={24} /> Resume & Preferences</h2>
-            
+            <h2 className="heading-2"><UploadCloud className="title-icon" size={22} /> Resume & Preferences</h2>
+
             <div className="form-field">
               <label className="body-text-bold">Target Role (Optional)</label>
               <div className="input-shell">
-                <Briefcase size={18} />
-                <input 
-                  type="text" 
-                  className="glass-input" 
-                  placeholder="e.g. Frontend Engineer" 
+                <Briefcase size={16} />
+                <input
+                  type="text"
+                  className="glass-input"
+                  placeholder="e.g. Frontend Engineer"
                   value={targetRole}
                   onChange={(e) => setTargetRole(e.target.value)}
                 />
@@ -251,77 +248,76 @@ const Dashboard = () => {
             </div>
 
             <div className="form-field">
-              <label className="body-text-bold">Locations <span style={{color:'var(--text-3)',fontWeight:400,fontSize:'0.8rem'}}>(add multiple)</span></label>
+              <label className="body-text-bold">
+                Locations <span style={{ color: 'var(--t3)', fontWeight: 400, fontSize: '0.78rem' }}>(add multiple)</span>
+              </label>
               <LocationPicker locations={locations} onChange={setLocations} />
             </div>
 
             <div className="upload-row">
               <label className="btn-primary upload-btn">
-                <UploadCloud size={18} />
-                {isProcessing ? 'Processing...' : 'Upload File'}
-                <input 
-                  type="file" 
-                  accept=".txt,.pdf,.docx" 
-                  style={{ display: 'none' }} 
+                <UploadCloud size={16} />
+                {isProcessing ? 'Processing…' : 'Upload File'}
+                <input
+                  type="file"
+                  accept=".txt,.pdf,.docx"
+                  style={{ display: 'none' }}
                   onChange={handleFileUpload}
                   disabled={isProcessing}
                 />
               </label>
               <span className="body-text">or paste text below</span>
             </div>
-            
-            <textarea 
-              className="glass-input" 
-              placeholder="Paste your resume text here..."
+
+            <textarea
+              className="glass-input"
+              placeholder="Paste your resume text here…"
               value={resumeText}
               onChange={(e) => setResumeText(e.target.value)}
-            ></textarea>
+            />
 
-            <button 
-              className="btn-primary" 
+            <button
+              className="btn-primary"
               onClick={handleAnalyze}
               disabled={isProcessing || !resumeText}
             >
-              <Search size={20} />
-              {isProcessing ? 'Analyzing...' : 'Analyze & Find Jobs'}
+              <Search size={18} />
+              {isProcessing ? 'Analyzing…' : 'Analyze & Find Jobs'}
             </button>
           </div>
 
           {atsScore !== null && (
-            <div className="card glass-panel animate-fade-in" style={{ animationDelay: '0.2s' }}>
-              <h2 className="heading-2"><CheckCircle2 className="title-icon" size={24} /> ATS Analysis</h2>
-              
-              <div style={{ display: 'flex', alignItems: 'center', gap: '2rem', marginBottom: '2rem' }}>
-                <div style={{ width: '120px', height: '120px', flexShrink: 0 }}>
-                  <svg style={{ height: 0, width: 0 }}>
+            <div className="card glass-panel animate-fade-in" style={{ animationDelay: '0.15s' }}>
+              <h2 className="heading-2"><CheckCircle2 className="title-icon" size={22} /> ATS Analysis</h2>
+
+              <div style={{ display: 'flex', alignItems: 'center', gap: '1.75rem', marginBottom: '1.75rem' }}>
+                <div style={{ width: '110px', height: '110px', flexShrink: 0 }}>
+                  <svg style={{ height: 0, width: 0, position: 'absolute' }}>
                     <defs>
-                      <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="0%">
-                        <stop offset="0%" stopColor="#a78bfa" />
-                        <stop offset="100%" stopColor="#f472b6" />
+                      <linearGradient id="atsg" x1="0%" y1="0%" x2="100%" y2="0%">
+                        <stop offset="0%" stopColor="#6366f1" />
+                        <stop offset="100%" stopColor="#a855f7" />
                       </linearGradient>
                     </defs>
                   </svg>
-                  <CircularProgressbar 
-                    value={atsScore} 
-                    text={`${atsScore}%`} 
-                    strokeWidth={8}
-                  />
+                  <CircularProgressbar value={atsScore} text={`${atsScore}%`} strokeWidth={9} />
                 </div>
                 <div>
-                  <h3 className="body-text-bold">Overall Compatibility</h3>
-                  <p className="body-text" style={{ color: 'var(--text-secondary)' }}>
-                    This score reflects how well your resume matches {targetRole ? `the ${targetRole} role` : 'industry standards'} based on keywords, structure, and formatting.
+                  <h3 className="body-text-bold" style={{ marginBottom: 6, fontSize: 13 }}>ATS Compatibility Score</h3>
+                  <p className="body-text" style={{ color: 'var(--t2)', lineHeight: 1.65 }}>
+                    How well your resume matches{' '}
+                    {targetRole ? `the ${targetRole} role` : 'industry standards'} based on keywords, structure, and formatting.
                   </p>
                 </div>
               </div>
 
               {feedback && feedback.length > 0 && (
                 <div>
-                  <h4 className="body-text-bold" style={{ marginBottom: '1rem' }}>Actionable Feedback</h4>
+                  <h4 className="body-text-bold" style={{ marginBottom: '10px', fontSize: 12 }}>Actionable Improvements</h4>
                   <ul className="feedback-list">
                     {feedback.map((item, i) => (
                       <li key={i} className="feedback-item">
-                        <AlertCircle className="feedback-icon" size={18} />
+                        <AlertCircle className="feedback-icon" size={16} />
                         <span className="body-text">{item}</span>
                       </li>
                     ))}
@@ -332,107 +328,83 @@ const Dashboard = () => {
           )}
         </div>
 
-        {/* Right Column: Live Jobs */}
+        {/* Right: Live Jobs */}
         <div className="card glass-panel jobs-panel">
-          <h2 className="heading-2"><Briefcase className="title-icon" size={24} /> Live Job Matches</h2>
-          
+          <h2 className="heading-2"><Briefcase className="title-icon" size={22} /> Live Job Matches</h2>
+
           {searchQuery && (
             <div className="results-summary">
               <p className="body-text">
-                Results for: <strong className="logo">{searchQuery}</strong>
+                Results for: <strong style={{ color: '#a78bfa' }}>{searchQuery}</strong>
               </p>
-              <span className="match-badge match-badge-outline">
-                {jobs.length} Jobs Found
-              </span>
+              <span className="match-badge match-badge-outline">{jobs.length} Found</span>
             </div>
           )}
-          
+
           {error && (
             <div className="error-banner">
-              <AlertCircle size={20} />
+              <AlertCircle size={18} />
               <p className="body-text-bold">{error}</p>
             </div>
           )}
-          
+
           {jobs.length === 0 && !error && !isProcessing ? (
             <div className="empty-state">
-              <Briefcase size={48} />
+              <Briefcase size={44} />
               <p className="body-text-bold">No jobs to display yet.</p>
               <p className="body-text">Upload your resume and click Analyze to fetch live listings.</p>
             </div>
           ) : isProcessing ? (
             <div className="loading-state">
-              <div className="loading-spinner"></div>
-              <p className="body-text-bold" style={{ color: 'var(--primary)' }}>Searching live databases...</p>
-              <style>{`@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } } @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }`}</style>
+              <div className="loading-spinner" />
+              <p className="body-text-bold" style={{ color: 'var(--primary)' }}>Searching live job databases…</p>
             </div>
           ) : (
-            <div className="jobs-grid animate-fade-in" style={{ animationDelay: '0.4s' }}>
+            <div className="jobs-grid animate-fade-in">
               {jobs.map((job, index) => (
-                <div key={job.id} className="job-card" style={{ animation: `fadeIn 0.5s ease-out ${0.1 * index}s backwards` }}>
-                  <div className="job-header" style={{ alignItems: 'flex-start' }}>
-                    <div>
+                <div key={job.id} className="job-card" style={{ animation: `fadeIn 0.4s ease-out ${0.06 * index}s backwards` }}>
+                  <div className="job-header">
+                    <div style={{ flex: 1, minWidth: 0 }}>
                       <h3 className="job-title">
                         {job.url ? (
-                          <a href={job.url} target="_blank" rel="noopener noreferrer">
-                            {job.title}
-                          </a>
-                        ) : (
-                          job.title
-                        )}
+                          <a href={job.url} target="_blank" rel="noopener noreferrer">{job.title}</a>
+                        ) : job.title}
                       </h3>
                       <div className="job-company">
                         {job.company}
-                        {job.platform && (
-                          <span className="match-badge platform-badge">
-                            {job.platform}
-                          </span>
-                        )}
-                        {job.posted_at && (
-                          <span className="posted-date">
-                            - {timeAgo(job.posted_at)}
-                          </span>
-                        )}
+                        {job.platform && <span className="match-badge platform-badge">{job.platform}</span>}
+                        {job.posted_at && <span className="posted-date">· {timeAgo(job.posted_at)}</span>}
                       </div>
                     </div>
-                    <div className="match-badge">{(job.match_score * 100).toFixed(0)}%</div>
+                    <div className="match-badge" style={{ flexShrink: 0 }}>{(job.match_score * 100).toFixed(0)}%</div>
                   </div>
-                  
+
                   {job.location && (
                     <div className="job-location">
-                      <MapPin size={14} />
-                      {job.location}
+                      <MapPin size={13} />{job.location}
                     </div>
                   )}
-                  
+
                   <div className="job-footer">
-                    {job.url ? (
-                      appliedJobs[job.id] === 'success' ? (
-                        <button className="apply-btn" style={{ background: '#10b981', color: 'white' }} disabled>
-                          <CheckCircle2 size={16} style={{ marginRight: '6px' }} />
-                          Successfully Applied
-                        </button>
-                      ) : appliedJobs[job.id] === 'manual' ? (
-                        <a href={job.url} target="_blank" rel="noopener noreferrer" className="apply-btn" style={{ background: '#f59e0b', color: 'white', textDecoration: 'none', display: 'flex', justifyContent: 'center' }}>
-                          <AlertCircle size={16} style={{ marginRight: '6px' }} />
-                          Apply Manually
-                        </a>
-                      ) : applyingJobs[job.id] ? (
-                        <button className="apply-btn" disabled>
-                          <div style={{ width: '16px', height: '16px', marginRight: '6px', borderRadius: '50%', border: '2px solid rgba(255,255,255,0.3)', borderTopColor: 'white', animation: 'spin 1s linear infinite' }}></div>
-                          Applying with AI...
-                        </button>
-                      ) : (
-                        <button 
-                          className="apply-btn" 
-                          onClick={() => handleAutoApply(job.id, job.url)}
-                          style={{ background: 'var(--primary)', color: 'white' }}
-                        >
-                          Auto-Apply with AI <ExternalLink size={14} style={{ marginLeft: '4px', verticalAlign: '-2px' }} />
-                        </button>
-                      )
-                    ) : (
+                    {!job.url ? (
                       <button className="apply-btn" disabled>Apply link unavailable</button>
+                    ) : appliedJobs[job.id] === 'success' ? (
+                      <button className="apply-btn" style={{ background: 'rgba(16,217,152,.1)', border: '1px solid rgba(16,217,152,.2)', color: '#10d998' }} disabled>
+                        <CheckCircle2 size={14} /> Applied Successfully
+                      </button>
+                    ) : appliedJobs[job.id] === 'manual' ? (
+                      <a href={job.url} target="_blank" rel="noopener noreferrer" className="apply-btn" style={{ background: 'rgba(245,158,11,.1)', border: '1px solid rgba(245,158,11,.2)', color: '#f59e0b', textDecoration: 'none' }}>
+                        <AlertCircle size={14} /> Apply Manually
+                      </a>
+                    ) : applyingJobs[job.id] ? (
+                      <button className="apply-btn" disabled>
+                        <div style={{ width: 14, height: 14, borderRadius: '50%', border: '2px solid rgba(255,255,255,.25)', borderTopColor: 'white', animation: 'spin 1s linear infinite' }} />
+                        Applying with AI…
+                      </button>
+                    ) : (
+                      <button className="apply-btn" onClick={() => handleAutoApply(job.id, job.url)} style={{ background: 'var(--g)', color: '#fff', border: 'none' }}>
+                        Auto-Apply with AI <ExternalLink size={13} />
+                      </button>
                     )}
                   </div>
                 </div>
@@ -441,6 +413,78 @@ const Dashboard = () => {
           )}
         </div>
       </div>
+
+      {/* ── How It Works ──────────────────────────────── */}
+      <div className="how-section">
+        <div className="section-tag"><Zap size={12} /> Simple & Powerful</div>
+        <h2 className="section-title">How Career Copilot works</h2>
+        <p className="section-sub">From resume upload to job offer — we guide every step of your journey.</p>
+
+        <div className="steps-grid">
+          <div className="step-card">
+            <div className="step-num">01</div>
+            <span className="step-emoji">📄</span>
+            <h3>Upload Your Resume</h3>
+            <p>Upload PDF, DOCX, or paste text. AI extracts your skills, experience, and achievements instantly. Supports all formats.</p>
+          </div>
+          <div className="step-card">
+            <div className="step-num">02</div>
+            <span className="step-emoji">🧠</span>
+            <h3>AI Analysis & Matching</h3>
+            <p>Get your ATS compatibility score with actionable feedback. Live job matches from LinkedIn, Naukri, and 50+ platforms in seconds.</p>
+          </div>
+          <div className="step-card">
+            <div className="step-num">03</div>
+            <span className="step-emoji">🚀</span>
+            <h3>Apply with Confidence</h3>
+            <p>Auto-apply with AI, prep for interviews with SRI, get custom cover letters, and negotiate your best salary offer.</p>
+          </div>
+        </div>
+      </div>
+
+      {/* ── Features Grid ─────────────────────────────── */}
+      <div className="features-section">
+        <div className="features-grid">
+          <div className="feature-card">
+            <div className="feature-icon">⚡</div>
+            <h4>Ultra-Fast AI</h4>
+            <p>Groq LPU delivers responses 10-20× faster than standard GPU-based AI services.</p>
+          </div>
+          <div className="feature-card">
+            <div className="feature-icon">🎯</div>
+            <h4>ATS Optimized</h4>
+            <p>Know exactly which keywords to add and how to rewrite bullet points for higher scores.</p>
+          </div>
+          <div className="feature-card">
+            <div className="feature-icon">🌍</div>
+            <h4>Global Job Search</h4>
+            <p>Live jobs from LinkedIn, Naukri, Indeed, and more — searched across multiple locations simultaneously.</p>
+          </div>
+          <div className="feature-card">
+            <div className="feature-icon">🔒</div>
+            <h4>Private & Secure</h4>
+            <p>Your resume is processed in-memory. We never sell your data or share it without consent.</p>
+          </div>
+        </div>
+      </div>
+
+      {/* ── CTA ──────────────────────────────────────── */}
+      {!user && (
+        <div className="cta-section">
+          <h2 className="cta-title">Ready to land your dream job?</h2>
+          <p className="cta-sub">
+            Join thousands of job seekers who found their next role with Career Copilot — it's free to start.
+          </p>
+          <div className="cta-btns">
+            <Link to="/signup" className="cta-btn-primary">
+              <Rocket size={16} /> Get Started Free
+            </Link>
+            <Link to="/faq" className="cta-btn-outline">
+              Learn more →
+            </Link>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

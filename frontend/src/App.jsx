@@ -1,10 +1,12 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Link, useNavigate } from 'react-router-dom';
-import { Rocket, LogIn, UserPlus, LogOut, User, ChevronDown } from 'lucide-react';
+import { Rocket, LogIn, UserPlus, LogOut, ChevronDown, HelpCircle } from 'lucide-react';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import Dashboard from './pages/Dashboard';
 import Login from './pages/Login';
 import Signup from './pages/Signup';
+import FAQ from './pages/FAQ';
+import ForgotPassword from './pages/ForgotPassword';
 
 // ─── Nav ─────────────────────────────────────────────────────────────────────
 
@@ -25,12 +27,13 @@ function Nav() {
   return (
     <nav className="glass-nav">
       <Link to="/" className="brand">
-        <Rocket size={26} />
+        <Rocket size={24} />
         <span className="logo">Career Copilot</span>
       </Link>
 
       <div className="nav-right">
         <Link to="/" className="nav-link">Dashboard</Link>
+        <Link to="/faq" className="nav-link">FAQ</Link>
 
         {loading ? (
           <div className="nav-skeleton" />
@@ -68,6 +71,30 @@ function Nav() {
   );
 }
 
+// ─── Footer ───────────────────────────────────────────────────────────────────
+
+function Footer() {
+  return (
+    <footer className="site-footer">
+      <div className="footer-inner">
+        <div className="footer-brand">
+          <Rocket size={17} className="footer-rocket" />
+          <span className="footer-name">Career Copilot</span>
+        </div>
+        <div className="footer-links">
+          <Link to="/" className="footer-link">Dashboard</Link>
+          <Link to="/faq" className="footer-link">FAQ</Link>
+          <Link to="/login" className="footer-link">Sign In</Link>
+          <Link to="/signup" className="footer-link">Get Started</Link>
+        </div>
+        <p className="footer-copy">
+          © 2025 Career Copilot · Powered by Groq + Llama 3.3 · Built for job seekers worldwide
+        </p>
+      </div>
+    </footer>
+  );
+}
+
 // ─── App ─────────────────────────────────────────────────────────────────────
 
 function AppInner() {
@@ -79,8 +106,11 @@ function AppInner() {
           <Route path="/" element={<Dashboard />} />
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
+          <Route path="/faq" element={<FAQ />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
         </Routes>
       </main>
+      <Footer />
     </div>
   );
 }
