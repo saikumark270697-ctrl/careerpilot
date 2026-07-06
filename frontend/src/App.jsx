@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route, Link, Navigate, useLocation, us
 import { Rocket, LogIn, UserPlus, LogOut, ChevronDown } from 'lucide-react';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import Dashboard from './pages/Dashboard';
+import Landing from './pages/Landing';
 import Login from './pages/Login';
 import Signup from './pages/Signup';
 import FAQ from './pages/FAQ';
@@ -29,7 +30,7 @@ function Nav() {
 
   return (
     <nav className="glass-nav">
-      <Link to={user ? '/dashboard' : '/login'} className="brand">
+      <Link to={user ? '/dashboard' : '/'} className="brand">
         <Rocket size={24} />
         <span className="logo">Career Copilot</span>
       </Link>
@@ -117,7 +118,7 @@ function RouteLoader() {
 function HomeRedirect() {
   const { user, loading } = useAuth();
   if (loading) return <RouteLoader />;
-  return <Navigate to={user ? '/dashboard' : '/login'} replace />;
+  return user ? <Navigate to="/dashboard" replace /> : <Landing />;
 }
 
 function RequireAuth({ children }) {

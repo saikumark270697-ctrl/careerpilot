@@ -1,8 +1,8 @@
 import React, { useState, useRef } from 'react';
 import { CircularProgressbar } from 'react-circular-progressbar';
 import 'react-circular-progressbar/dist/styles.css';
-import { UploadCloud, Search, MapPin, Briefcase, ExternalLink, AlertCircle, CheckCircle2, X as XIcon, Plus, Rocket, Zap, Bot, Shield } from 'lucide-react';
-import { Link, useNavigate } from 'react-router-dom';
+import { UploadCloud, Search, MapPin, Briefcase, ExternalLink, AlertCircle, CheckCircle2, X as XIcon, Plus } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import Chatbot from '../components/Chatbot';
 import { useAuth } from '../context/AuthContext';
 
@@ -183,47 +183,10 @@ const Dashboard = () => {
         onSignIn={(mode) => navigate(mode === 'signup' ? '/signup' : '/login')}
       />
 
-      {/* ── Hero ─────────────────────────────────────── */}
-      <div className="hero-section">
-        <div className="hero-badge">
-          <Zap size={12} /> Powered by Groq · Llama 3.3 · Ultra-fast AI
-        </div>
-        <h1 className="heading-1">
-          Your <span className="hero-grad">Career Copilot</span>
-        </h1>
-        <p className="hero-subtitle">
-          Upload your resume, get your ATS score, find live job matches, and let{' '}
-          <strong>SRI</strong> — your AI career assistant — guide you to your next role.
-        </p>
-        <div className="hero-cta-row">
-          <button
-            className="hero-cta-primary"
-            onClick={() => uploadRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })}
-          >
-            <UploadCloud size={16} /> Analyze My Resume
-          </button>
-          <Link to="/faq" className="hero-cta-secondary">
-            How it works →
-          </Link>
-        </div>
-        <div className="hero-stats">
-          <div className="hero-stat">
-            <span className="hero-stat-n">50K+</span>
-            <span className="hero-stat-label">Jobs Daily</span>
-          </div>
-          <div className="hero-stat">
-            <span className="hero-stat-n">ATS</span>
-            <span className="hero-stat-label">Optimized</span>
-          </div>
-          <div className="hero-stat">
-            <span className="hero-stat-n">AI</span>
-            <span className="hero-stat-label">Powered</span>
-          </div>
-          <div className="hero-stat">
-            <span className="hero-stat-n">Free</span>
-            <span className="hero-stat-label">To Start</span>
-          </div>
-        </div>
+      {/* ── Header ───────────────────────────────────── */}
+      <div className="dash-header">
+        <h1>Welcome back, {user?.name?.split(' ')[0] || 'there'} 👋</h1>
+        <p>Upload your resume to get your ATS score and today's live job matches.</p>
       </div>
 
       {/* ── Main Grid ─────────────────────────────────── */}
@@ -414,77 +377,6 @@ const Dashboard = () => {
         </div>
       </div>
 
-      {/* ── How It Works ──────────────────────────────── */}
-      <div className="how-section">
-        <div className="section-tag"><Zap size={12} /> Simple & Powerful</div>
-        <h2 className="section-title">How Career Copilot works</h2>
-        <p className="section-sub">From resume upload to job offer — we guide every step of your journey.</p>
-
-        <div className="steps-grid">
-          <div className="step-card">
-            <div className="step-num">01</div>
-            <span className="step-emoji">📄</span>
-            <h3>Upload Your Resume</h3>
-            <p>Upload PDF, DOCX, or paste text. AI extracts your skills, experience, and achievements instantly. Supports all formats.</p>
-          </div>
-          <div className="step-card">
-            <div className="step-num">02</div>
-            <span className="step-emoji">🧠</span>
-            <h3>AI Analysis & Matching</h3>
-            <p>Get your ATS compatibility score with actionable feedback. Live job matches from LinkedIn, Naukri, and 50+ platforms in seconds.</p>
-          </div>
-          <div className="step-card">
-            <div className="step-num">03</div>
-            <span className="step-emoji">🚀</span>
-            <h3>Apply with Confidence</h3>
-            <p>Auto-apply with AI, prep for interviews with SRI, get custom cover letters, and negotiate your best salary offer.</p>
-          </div>
-        </div>
-      </div>
-
-      {/* ── Features Grid ─────────────────────────────── */}
-      <div className="features-section">
-        <div className="features-grid">
-          <div className="feature-card">
-            <div className="feature-icon">⚡</div>
-            <h4>Ultra-Fast AI</h4>
-            <p>Groq LPU delivers responses 10-20× faster than standard GPU-based AI services.</p>
-          </div>
-          <div className="feature-card">
-            <div className="feature-icon">🎯</div>
-            <h4>ATS Optimized</h4>
-            <p>Know exactly which keywords to add and how to rewrite bullet points for higher scores.</p>
-          </div>
-          <div className="feature-card">
-            <div className="feature-icon">🌍</div>
-            <h4>Global Job Search</h4>
-            <p>Live jobs from LinkedIn, Naukri, Indeed, and more — searched across multiple locations simultaneously.</p>
-          </div>
-          <div className="feature-card">
-            <div className="feature-icon">🔒</div>
-            <h4>Private & Secure</h4>
-            <p>Your resume is processed in-memory. We never sell your data or share it without consent.</p>
-          </div>
-        </div>
-      </div>
-
-      {/* ── CTA ──────────────────────────────────────── */}
-      {!user && (
-        <div className="cta-section">
-          <h2 className="cta-title">Ready to land your dream job?</h2>
-          <p className="cta-sub">
-            Join thousands of job seekers who found their next role with Career Copilot — it's free to start.
-          </p>
-          <div className="cta-btns">
-            <Link to="/signup" className="cta-btn-primary">
-              <Rocket size={16} /> Get Started Free
-            </Link>
-            <Link to="/faq" className="cta-btn-outline">
-              Learn more →
-            </Link>
-          </div>
-        </div>
-      )}
     </div>
   );
 };
