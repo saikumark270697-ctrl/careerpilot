@@ -40,7 +40,7 @@ const Signup = () => {
 
   const strength = password.length === 0 ? 0 : password.length < 6 ? 1 : password.length < 10 ? 2 : 3;
   const strengthLabel = ['', 'Weak', 'Good', 'Strong'];
-  const strengthColor = ['', '#f87171', '#f59e0b', '#10b981'];
+  const strengthColor = ['', '#dc2626', '#d97706', '#059669'];
 
   if (authLoading) {
     return (
@@ -125,7 +125,7 @@ const Signup = () => {
               <div className="pw-strength">
                 <div className="pw-bar">
                   {[1, 2, 3].map(l => (
-                    <div key={l} className="pw-segment" style={{ background: strength >= l ? strengthColor[strength] : 'rgba(255,255,255,0.08)' }} />
+                    <div key={l} className="pw-segment" style={{ background: strength >= l ? strengthColor[strength] : 'var(--s3)' }} />
                   ))}
                 </div>
                 <span style={{ color: strengthColor[strength], fontSize: '0.72rem' }}>{strengthLabel[strength]}</span>

@@ -295,8 +295,8 @@ const Dashboard = () => {
                   <svg style={{ height: 0, width: 0, position: 'absolute' }}>
                     <defs>
                       <linearGradient id="atsg" x1="0%" y1="0%" x2="100%" y2="0%">
-                        <stop offset="0%" stopColor="#6366f1" />
-                        <stop offset="100%" stopColor="#a855f7" />
+                        <stop offset="0%" stopColor="#4f46e5" />
+                        <stop offset="100%" stopColor="#7c3aed" />
                       </linearGradient>
                     </defs>
                   </svg>
@@ -335,7 +335,7 @@ const Dashboard = () => {
           {searchQuery && (
             <div className="results-summary">
               <p className="body-text">
-                Results for: <strong style={{ color: '#a78bfa' }}>{searchQuery}</strong>
+                Results for: <strong style={{ color: 'var(--p)' }}>{searchQuery}</strong>
               </p>
               <span className="match-badge match-badge-outline">{jobs.length} Found</span>
             </div>
@@ -389,11 +389,11 @@ const Dashboard = () => {
                     {!job.url ? (
                       <button className="apply-btn" disabled>Apply link unavailable</button>
                     ) : appliedJobs[job.id] === 'success' ? (
-                      <button className="apply-btn" style={{ background: 'rgba(16,217,152,.1)', border: '1px solid rgba(16,217,152,.2)', color: '#10d998' }} disabled>
+                      <button className="apply-btn" style={{ background: '#ecfaf4', border: '1px solid #c4ecd9', color: 'var(--green)' }} disabled>
                         <CheckCircle2 size={14} /> Applied Successfully
                       </button>
                     ) : appliedJobs[job.id] === 'manual' ? (
-                      <a href={job.url} target="_blank" rel="noopener noreferrer" className="apply-btn" style={{ background: 'rgba(245,158,11,.1)', border: '1px solid rgba(245,158,11,.2)', color: '#f59e0b', textDecoration: 'none' }}>
+                      <a href={job.url} target="_blank" rel="noopener noreferrer" className="apply-btn" style={{ background: '#fdf7ec', border: '1px solid #f5e3bd', color: 'var(--amber)', textDecoration: 'none' }}>
                         <AlertCircle size={14} /> Apply Manually
                       </a>
                     ) : applyingJobs[job.id] ? (
