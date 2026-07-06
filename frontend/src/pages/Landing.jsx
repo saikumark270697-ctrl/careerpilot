@@ -16,12 +16,12 @@ const FEATURES = [
 ];
 
 const COMPARISON = [
-  { feature: 'ATS resume score', us: true, jobscan: true, lazyapply: false, teal: true },
-  { feature: 'Live job matching', us: true, jobscan: true, lazyapply: true, teal: true },
-  { feature: 'AI auto-apply', us: true, jobscan: true, lazyapply: true, teal: false },
-  { feature: 'AI career chatbot', us: true, jobscan: false, lazyapply: false, teal: false },
-  { feature: 'All-in-one workflow', us: true, jobscan: false, lazyapply: false, teal: false },
-  { feature: 'Free to start', us: true, jobscan: true, lazyapply: false, teal: true },
+  { feature: 'ATS resume score', us: true, checkers: true, appliers: false, trackers: true },
+  { feature: 'Live job matching', us: true, checkers: false, appliers: true, trackers: true },
+  { feature: 'AI auto-apply', us: true, checkers: false, appliers: true, trackers: false },
+  { feature: 'AI career chatbot', us: true, checkers: false, appliers: false, trackers: false },
+  { feature: 'All-in-one workflow', us: true, checkers: false, appliers: false, trackers: false },
+  { feature: 'Free to start', us: true, checkers: true, appliers: false, trackers: true },
 ];
 
 const FAQ_TEASER = [
@@ -172,9 +172,9 @@ const Landing = () => {
               <tr>
                 <th>Feature</th>
                 <th className="cmp-us-col"><Rocket size={13} /> Career Copilot</th>
-                <th>Jobscan</th>
-                <th>LazyApply</th>
-                <th>Teal</th>
+                <th>Resume checkers</th>
+                <th>Auto-apply bots</th>
+                <th>Job trackers</th>
               </tr>
             </thead>
             <tbody>
@@ -182,15 +182,15 @@ const Landing = () => {
                 <tr key={row.feature}>
                   <td>{row.feature}</td>
                   <td className="cmp-us-col"><Check yes={row.us} /></td>
-                  <td><Check yes={row.jobscan} /></td>
-                  <td><Check yes={row.lazyapply} /></td>
-                  <td><Check yes={row.teal} /></td>
+                  <td><Check yes={row.checkers} /></td>
+                  <td><Check yes={row.appliers} /></td>
+                  <td><Check yes={row.trackers} /></td>
                 </tr>
               ))}
             </tbody>
           </table>
         </div>
-        <p className="cmp-note">Based on each product's public feature pages, July 2026.</p>
+        <p className="cmp-note">Typical capabilities of single-purpose tools in each category, July 2026.</p>
       </div>
 
       {/* ── FAQ teaser ───────────────────────────────── */}

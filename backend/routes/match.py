@@ -1,3 +1,5 @@
+import time
+
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 from typing import List, Optional
@@ -59,7 +61,9 @@ def find_job_matches(request: MatchRequest):
     live_jobs = []
     seen_keys = set()
     try:
-        for loc in location_list[:3]:  # max 3 locations to stay within rate limits
+        for i, loc in enumerate(location_list[:2]):  # max 2 locations = 2 API requests per analyze
+            if i > 0:
+                time.sleep(1.2)  # JSearch free tier also enforces a per-second rate limit
             for job in search_jobs(search_query, location=loc, num_pages=1):
                 key = f"{job.get('title','').lower()}-{job.get('company','').lower()}"
                 if key not in seen_keys:
