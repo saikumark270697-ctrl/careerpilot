@@ -75,8 +75,9 @@ const LocationPicker = ({ locations, onChange }) => {
 const API_BASE = import.meta.env.VITE_API_URL || '';
 
 const Dashboard = () => {
-  const { user } = useAuth();
+  const { user, token } = useAuth();
   const navigate = useNavigate();
+  const authHeaders = { Authorization: `Bearer ${token}` };
   const [resumeText, setResumeText] = useState('');
   const [targetRole, setTargetRole] = useState('');
   const [locations, setLocations] = useState(['Remote']);
@@ -113,7 +114,7 @@ const Dashboard = () => {
     try {
       const response = await fetch(`${API_BASE}/api/match/auto-apply`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', ...authHeaders },
         body: JSON.stringify({ job_url: jobUrl, resume_text: resumeText }),
       });
       const data = await response.json();
@@ -137,7 +138,7 @@ const Dashboard = () => {
     const formData = new FormData();
     formData.append('file', file);
     try {
-      const response = await fetch(`${API_BASE}/api/resume/upload`, { method: 'POST', body: formData });
+      const response = await fetch(`${API_BASE}/api/resume/upload`, { method: 'POST', headers: authHeaders, body: formData });
       const data = await response.json();
       if (response.ok) setResumeText(data.text);
       else alert(data.detail || 'Failed to process file');
@@ -157,7 +158,7 @@ const Dashboard = () => {
     try {
       const response = await fetch(`${API_BASE}/api/match/find`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', ...authHeaders },
         body: JSON.stringify({ resume_text: resumeText, target_role: targetRole, location: locations.join(', ') || 'Remote' }),
       });
       const data = await response.json();

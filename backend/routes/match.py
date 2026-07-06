@@ -1,8 +1,10 @@
 import time
 
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Depends
 from pydantic import BaseModel
 from typing import List, Optional
+
+from routes.auth import get_current_user
 
 from agents.resume_agent import extract_resume_details
 from agents.job_search_agent import search_jobs
@@ -44,7 +46,7 @@ class AutoApplyRequest(BaseModel):
 
 
 @router.post("/find", response_model=MatchResponse)
-def find_job_matches(request: MatchRequest):
+def find_job_matches(request: MatchRequest, user=Depends(get_current_user)):
     if not request.resume_text.strip():
         raise HTTPException(status_code=400, detail="Resume text is required.")
 
@@ -107,7 +109,7 @@ def find_job_matches(request: MatchRequest):
 
 
 @router.post("/auto-apply")
-async def apply_to_job(request: AutoApplyRequest):
+async def apply_to_job(request: AutoApplyRequest, user=Depends(get_current_user)):
     if not request.job_url:
         raise HTTPException(status_code=400, detail="Job URL is required.")
         

@@ -1,0 +1,7 @@
+User-agent: *
+Disallow: /dashboard
+Disallow: /login
+Disallow: /signup
+Disallow: /forgot-password
+Disallow: /api/
+Crawl-delay: 10

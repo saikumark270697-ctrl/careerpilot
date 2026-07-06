@@ -30,12 +30,78 @@ async def honor_forwarded_proto(request, call_next):
     return await call_next(request)
 
 
+# ── Security headers ─────────────────────────────────────────────────────────
+@app.middleware("http")
+async def security_headers(request, call_next):
+    response = await call_next(request)
+    response.headers.setdefault("X-Content-Type-Options", "nosniff")
+    response.headers.setdefault("X-Frame-Options", "DENY")
+    response.headers.setdefault("Referrer-Policy", "strict-origin-when-cross-origin")
+    response.headers.setdefault("Permissions-Policy", "camera=(), microphone=(), geolocation=()")
+    response.headers.setdefault("Strict-Transport-Security", "max-age=31536000; includeSubDomains")
+    if request.url.path.startswith("/api"):
+        # Keep API responses out of search engines entirely
+        response.headers.setdefault("X-Robots-Tag", "noindex, nofollow")
+    return response
+
+
+# ── Rate limiting (in-memory sliding window per client IP) ──────────────────
+# Blunt-force protection for login brute-forcing and quota-draining scripts.
+_RATE_LIMITS = {
+    "/api/auth": (15, 60),     # 15 requests / 60s — stops password brute force
+    "/api/chat": (20, 60),     # LLM quota protection
+    "/api/match": (6, 60),     # RapidAPI quota protection
+    "/api/resume": (10, 60),
+}
+_rate_buckets: dict = {}
+_RATE_BUCKET_CAP = 10000  # drop everything if an attacker rotates IPs to bloat memory
+
+
+def _client_ip(request) -> str:
+    fwd = request.headers.get("x-forwarded-for", "")
+    if fwd:
+        return fwd.split(",")[0].strip()
+    return request.client.host if request.client else "unknown"
+
+
+@app.middleware("http")
+async def rate_limiter(request, call_next):
+    path = request.url.path
+    for prefix, (limit, window) in _RATE_LIMITS.items():
+        if path.startswith(prefix):
+            import time as _time
+            now = _time.monotonic()
+            key = f"{_client_ip(request)}:{prefix}"
+            if len(_rate_buckets) > _RATE_BUCKET_CAP:
+                _rate_buckets.clear()
+            bucket = _rate_buckets.setdefault(key, [])
+            bucket[:] = [t for t in bucket if now - t < window]
+            if len(bucket) >= limit:
+                return JSONResponse(
+                    status_code=429,
+                    content={"detail": "Too many requests. Please slow down and try again in a minute."},
+                    headers={"Retry-After": str(window)},
+                )
+            bucket.append(now)
+            break
+    return await call_next(request)
+
+
+# ── CORS: only the real frontend origins, not the whole internet ────────────
+_default_origins = (
+    "https://careerpilot-production-31bf.up.railway.app,"
+    "http://localhost:5173,http://localhost:4173,http://127.0.0.1:5173"
+)
+ALLOWED_ORIGINS = [
+    o.strip() for o in os.getenv("ALLOWED_ORIGINS", _default_origins).split(",") if o.strip()
+]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=ALLOWED_ORIGINS,
     allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allow_headers=["Authorization", "Content-Type"],
 )
 
 # API routes — must be registered BEFORE the static file mount

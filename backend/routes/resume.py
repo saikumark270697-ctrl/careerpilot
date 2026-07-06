@@ -1,12 +1,18 @@
-from fastapi import APIRouter, UploadFile, File, HTTPException
+from fastapi import APIRouter, UploadFile, File, HTTPException, Depends
 import io
+
+from routes.auth import get_current_user
 
 router = APIRouter()
 
+MAX_UPLOAD_BYTES = 5 * 1024 * 1024  # 5 MB — resumes are small; reject dumps
+
 @router.post("/upload")
-async def upload_resume(file: UploadFile = File(...)):
+async def upload_resume(file: UploadFile = File(...), user=Depends(get_current_user)):
     try:
         content = await file.read()
+        if len(content) > MAX_UPLOAD_BYTES:
+            raise HTTPException(status_code=413, detail="File too large. Maximum size is 5 MB.")
         text = ""
         filename = file.filename.lower()
         
@@ -31,7 +37,9 @@ async def upload_resume(file: UploadFile = File(...)):
             raise HTTPException(status_code=400, detail="Unsupported file format. Please upload PDF, DOCX, or TXT.")
             
         return {"message": "File processed successfully", "text": text.strip()}
-        
+
+    except HTTPException:
+        raise
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error processing file: {str(e)}")
 

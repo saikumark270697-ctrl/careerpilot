@@ -20,7 +20,15 @@ import models
 
 router = APIRouter()
 
-SECRET_KEY = os.getenv("JWT_SECRET", "supersecretjwtkey_replace_in_prod")
+# Never fall back to a secret that lives in a public repo — forged tokens would
+# pass verification. If JWT_SECRET is unset we generate a per-boot secret:
+# sessions won't survive a restart, but nobody can mint tokens offline.
+SECRET_KEY = os.getenv("JWT_SECRET", "").strip()
+if not SECRET_KEY:
+    SECRET_KEY = secrets.token_hex(32)
+    print("[auth] WARNING: JWT_SECRET not set — using an ephemeral secret. "
+          "Sessions will be invalidated on every restart. Set JWT_SECRET in "
+          "Railway environment variables for stable logins.")
 ALGORITHM = "HS256"
 TOKEN_EXPIRE_DAYS = 30
 OTP_EXPIRE_MINUTES = int(os.getenv("OTP_EXPIRE_MINUTES", "10"))
