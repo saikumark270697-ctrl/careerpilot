@@ -15,7 +15,7 @@ if sys.platform == 'win32':
 # Create database tables
 Base.metadata.create_all(bind=engine)
 
-app = FastAPI(title="Career Copilot API")
+app = FastAPI(title="RoleFlight API")
 
 
 @app.middleware("http")
@@ -146,4 +146,4 @@ if os.path.isdir(_frontend_dist):
 else:
     @app.get("/")
     def read_root():
-        return {"message": "Career Copilot API — frontend not built"}
+        return {"message": "RoleFlight API — frontend not built"}

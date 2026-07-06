@@ -25,7 +25,7 @@ const COMPARISON = [
 ];
 
 const FAQ_TEASER = [
-  { q: 'Is Career Copilot really free?', a: 'Yes — upload your resume, get your ATS score, and browse live job matches completely free. No credit card required to start.' },
+  { q: 'Is RoleFlight really free?', a: 'Yes — upload your resume, get your ATS score, and browse live job matches completely free. No credit card required to start.' },
   { q: 'How does the ATS score work?', a: 'We analyze your resume the way applicant tracking systems do — keywords, structure, and formatting — then score it against your target role and tell you exactly what to fix.' },
   { q: 'Does auto-apply spam job boards?', a: 'No. You choose each job you want to apply to; the AI just does the tedious form-filling. Quality applications, not spray-and-pray.' },
 ];
@@ -74,7 +74,7 @@ const Landing = () => {
           <div className="preview-window">
             <div className="preview-titlebar">
               <span className="preview-dot" /><span className="preview-dot" /><span className="preview-dot" />
-              <span className="preview-url">careercopilot — dashboard</span>
+              <span className="preview-url">roleflight — dashboard</span>
             </div>
             <div className="preview-body">
               <div className="preview-score">
@@ -162,7 +162,7 @@ const Landing = () => {
       {/* ── Comparison ───────────────────────────────── */}
       <div className="landing-section">
         <div className="section-head">
-          <div className="section-tag"><Target size={12} /> Why Career Copilot</div>
+          <div className="section-tag"><Target size={12} /> Why RoleFlight</div>
           <h2 className="section-title">Point tools solve half the problem</h2>
           <p className="section-sub">Resume checkers don't find you jobs. Auto-appliers don't fix your resume. We do the whole pipeline.</p>
         </div>
@@ -171,7 +171,7 @@ const Landing = () => {
             <thead>
               <tr>
                 <th>Feature</th>
-                <th className="cmp-us-col"><Rocket size={13} /> Career Copilot</th>
+                <th className="cmp-us-col"><Rocket size={13} /> RoleFlight</th>
                 <th>Resume checkers</th>
                 <th>Auto-apply bots</th>
                 <th>Job trackers</th>

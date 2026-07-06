@@ -5,8 +5,8 @@ import { Rocket, ChevronDown, Zap, Shield, Globe, Star, MessageCircle, HelpCircl
 const FAQ_DATA = [
   {
     icon: '🚀',
-    q: 'What is Career Copilot?',
-    a: 'Career Copilot is an AI-powered career acceleration platform. Upload your resume, receive an instant ATS compatibility score, discover live job matches from LinkedIn, Naukri, and 50+ platforms, and get personalized coaching from SRI — your AI career assistant powered by Groq and Llama 3.3.',
+    q: 'What is RoleFlight?',
+    a: 'RoleFlight is an AI-powered career acceleration platform. Upload your resume, receive an instant ATS compatibility score, discover live job matches from LinkedIn, Naukri, and 50+ platforms, and get personalized coaching from SRI — your AI career assistant powered by Groq and Llama 3.3.',
   },
   {
     icon: '🤖',
@@ -15,7 +15,7 @@ const FAQ_DATA = [
   },
   {
     icon: '💸',
-    q: 'Is Career Copilot free?',
+    q: 'Is RoleFlight free?',
     a: 'Yes — completely free to start. Upload your resume, get your ATS score, see live job matches, and ask SRI 3 questions all without creating an account. Sign up for a free account to unlock unlimited SRI conversations, full resume analysis with personalized feedback, and interview preparation tools.',
   },
   {
@@ -41,7 +41,7 @@ const FAQ_DATA = [
   {
     icon: '🌍',
     q: 'Which countries and locations are supported?',
-    a: 'Career Copilot supports job searches globally. You can select multiple locations including Indian cities (Hyderabad, Bangalore, Delhi, Mumbai, Chennai, Pune, Kolkata, Noida, Gurgaon), international markets (USA, UK, Canada, Singapore, Australia), or choose Remote for location-independent roles.',
+    a: 'RoleFlight supports job searches globally. You can select multiple locations including Indian cities (Hyderabad, Bangalore, Delhi, Mumbai, Chennai, Pune, Kolkata, Noida, Gurgaon), international markets (USA, UK, Canada, Singapore, Australia), or choose Remote for location-independent roles.',
   },
   {
     icon: '💼',

@@ -32,7 +32,7 @@ function Nav() {
     <nav className="glass-nav">
       <Link to={user ? '/dashboard' : '/'} className="brand">
         <Rocket size={24} />
-        <span className="logo">Career Copilot</span>
+        <span className="logo">RoleFlight</span>
       </Link>
 
       <div className="nav-right">
@@ -88,7 +88,7 @@ function Footer() {
       <div className="footer-inner">
         <div className="footer-brand">
           <Rocket size={17} className="footer-rocket" />
-          <span className="footer-name">Career Copilot</span>
+          <span className="footer-name">RoleFlight</span>
         </div>
         <div className="footer-links">
           {user && <Link to="/dashboard" className="footer-link">Dashboard</Link>}
@@ -97,7 +97,7 @@ function Footer() {
           {!user && <Link to="/signup" className="footer-link">Get Started</Link>}
         </div>
         <p className="footer-copy">
-          © 2025 Career Copilot · Powered by Groq + Llama 3.3 · Built for job seekers worldwide
+          © 2025 RoleFlight · Powered by Groq + Llama 3.3 · Built for job seekers worldwide
         </p>
       </div>
     </footer>

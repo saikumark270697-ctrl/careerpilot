@@ -27,7 +27,7 @@ const ForgotPassword = () => {
       <div className="auth-card">
         <Link to="/" className="auth-brand">
           <Rocket size={26} className="auth-brand-icon" />
-          <span className="auth-brand-name">Career Copilot</span>
+          <span className="auth-brand-name">RoleFlight</span>
         </Link>
 
         {sent ? (
