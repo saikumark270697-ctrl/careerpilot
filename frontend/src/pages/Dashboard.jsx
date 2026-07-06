@@ -12,13 +12,17 @@ const LOCATION_PRESETS = [
   'USA', 'UK', 'Canada', 'Singapore', 'Australia',
 ];
 
+const MAX_LOCATIONS = 2; // backend searches at most 2 locations per analyze
+
 const LocationPicker = ({ locations, onChange }) => {
   const [inputVal, setInputVal] = useState('');
   const inputRef = useRef(null);
 
   const add = (loc) => {
     const clean = loc.trim();
-    if (clean && !locations.includes(clean)) onChange([...locations, clean]);
+    if (clean && !locations.includes(clean) && locations.length < MAX_LOCATIONS) {
+      onChange([...locations, clean]);
+    }
     setInputVal('');
     inputRef.current?.focus();
   };
@@ -58,7 +62,7 @@ const LocationPicker = ({ locations, onChange }) => {
         />
       </div>
       <div className="loc-presets">
-        {suggestions.slice(0, 8).map(p => (
+        {locations.length < MAX_LOCATIONS && suggestions.slice(0, 8).map(p => (
           <button key={p} className="loc-preset-chip" onClick={() => add(p)}>
             <Plus size={10} /> {p}
           </button>
@@ -73,7 +77,6 @@ const API_BASE = import.meta.env.VITE_API_URL || '';
 const Dashboard = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
-  const uploadRef = useRef(null);
   const [resumeText, setResumeText] = useState('');
   const [targetRole, setTargetRole] = useState('');
   const [locations, setLocations] = useState(['Remote']);
@@ -190,7 +193,7 @@ const Dashboard = () => {
       </div>
 
       {/* ── Main Grid ─────────────────────────────────── */}
-      <div className="dashboard-grid" ref={uploadRef}>
+      <div className="dashboard-grid">
         {/* Left: Inputs & Score */}
         <div className="panel-stack">
           <div className="card glass-panel">
@@ -212,7 +215,7 @@ const Dashboard = () => {
 
             <div className="form-field">
               <label className="body-text-bold">
-                Locations <span style={{ color: 'var(--t3)', fontWeight: 400, fontSize: '0.78rem' }}>(add multiple)</span>
+                Locations <span style={{ color: 'var(--t3)', fontWeight: 400, fontSize: '0.78rem' }}>(up to 2)</span>
               </label>
               <LocationPicker locations={locations} onChange={setLocations} />
             </div>

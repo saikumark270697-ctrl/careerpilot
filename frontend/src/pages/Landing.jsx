@@ -207,7 +207,7 @@ const Landing = () => {
                 <ChevronDown size={17} className="faq-chevron" />
               </button>
               {openFaq === i && (
-                <div className="faq-answer" style={{ paddingLeft: 20 }}>
+                <div className="faq-answer landing-faq-answer">
                   <p>{item.a}</p>
                 </div>
               )}
