@@ -9,10 +9,12 @@ import { useAuth } from '../context/AuthContext';
 const LOCATION_PRESETS = [
   'Remote', 'Hyderabad', 'Bangalore', 'Delhi', 'Mumbai',
   'Chennai', 'Pune', 'Kolkata', 'Noida', 'Gurgaon',
+  'Telangana', 'Karnataka', 'Maharashtra', 'Tamil Nadu',
   'USA', 'UK', 'Canada', 'Singapore', 'Australia',
+  'California', 'Texas', 'New York', 'Dubai', 'Germany',
 ];
 
-const MAX_LOCATIONS = 2; // backend searches at most 2 locations per analyze
+const MAX_LOCATIONS = 4; // backend searches at most 4 locations per analyze
 
 const LocationPicker = ({ locations, onChange }) => {
   const [inputVal, setInputVal] = useState('');
@@ -55,7 +57,7 @@ const LocationPicker = ({ locations, onChange }) => {
         <input
           ref={inputRef}
           className="loc-tag-input"
-          placeholder={locations.length === 0 ? 'Add locations…' : ''}
+          placeholder={locations.length === 0 ? 'Type a city, state, or country…' : ''}
           value={inputVal}
           onChange={e => setInputVal(e.target.value)}
           onKeyDown={handleKey}
@@ -222,7 +224,7 @@ const Dashboard = () => {
 
             <div className="form-field">
               <label className="body-text-bold">
-                Locations <span style={{ color: 'var(--t3)', fontWeight: 400, fontSize: '0.78rem' }}>(up to 2)</span>
+                Locations <span style={{ color: 'var(--t3)', fontWeight: 400, fontSize: '0.78rem' }}>(any city, state, or country · up to 4)</span>
               </label>
               <LocationPicker locations={locations} onChange={setLocations} />
             </div>

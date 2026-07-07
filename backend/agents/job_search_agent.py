@@ -17,10 +17,15 @@ _ADZUNA_COUNTRIES = {
     "india": "in", "hyderabad": "in", "bangalore": "in", "bengaluru": "in",
     "delhi": "in", "mumbai": "in", "chennai": "in", "pune": "in",
     "kolkata": "in", "noida": "in", "gurgaon": "in",
+    "telangana": "in", "karnataka": "in", "maharashtra": "in", "tamil nadu": "in",
+    "kerala": "in", "gujarat": "in", "rajasthan": "in", "punjab": "in",
     "usa": "us", "united states": "us", "america": "us",
+    "california": "us", "texas": "us", "new york": "us", "florida": "us",
+    "washington": "us", "seattle": "us", "boston": "us", "chicago": "us",
     "uk": "gb", "united kingdom": "gb", "london": "gb",
-    "canada": "ca", "australia": "au", "singapore": "sg",
-    "germany": "de", "france": "fr", "netherlands": "nl",
+    "canada": "ca", "toronto": "ca", "australia": "au", "sydney": "au",
+    "singapore": "sg", "germany": "de", "berlin": "de",
+    "france": "fr", "netherlands": "nl", "dubai": "ae", "uae": "ae",
 }
 
 

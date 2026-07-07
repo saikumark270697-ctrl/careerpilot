@@ -63,7 +63,7 @@ def find_job_matches(request: MatchRequest, user=Depends(get_current_user)):
     live_jobs = []
     seen_keys = set()
     try:
-        for i, loc in enumerate(location_list[:2]):  # max 2 locations = 2 API requests per analyze
+        for i, loc in enumerate(location_list[:4]):  # each location costs one provider request
             if i > 0:
                 time.sleep(1.2)  # JSearch free tier also enforces a per-second rate limit
             for job in search_jobs(search_query, location=loc, num_pages=1):
