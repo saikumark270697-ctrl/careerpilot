@@ -123,6 +123,10 @@ def search_jobs(query: str, location: str = "remote", num_pages: int = 1) -> Lis
             return _fetch_jobs_jsearch(query, location, page=1)
         except QuotaExceeded:
             providers_tried.append("JSearch (quota reached)")
+        except Exception as e:
+            # Bad key, network error, schema change — log and move on to Adzuna
+            print(f"[job_search] JSearch failed, falling back to Adzuna: {e}")
+            providers_tried.append("JSearch (error)")
 
     if ADZUNA_APP_ID and ADZUNA_APP_KEY:
         try:
@@ -132,7 +136,7 @@ def search_jobs(query: str, location: str = "remote", num_pages: int = 1) -> Lis
 
     if providers_tried:
         raise ValueError(
-            "Job search is temporarily unavailable — daily/monthly limits reached on: "
+            "Job search is temporarily unavailable — providers failed: "
             + ", ".join(providers_tried)
             + ". Limits reset automatically; please try again later."
         )
