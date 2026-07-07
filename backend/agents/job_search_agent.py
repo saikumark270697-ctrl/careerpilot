@@ -39,19 +39,33 @@ def _adzuna_country(location: str) -> str:
 
 def _fetch_jobs_jsearch(query: str, location: str, page: int = 1) -> List[dict]:
     """One JSearch request. JSearch aggregates LinkedIn, Indeed, Naukri,
-    Glassdoor, etc. natively — job_publisher tells us the source board."""
-    url = "https://jsearch.p.rapidapi.com/search"
-    querystring = {
-        "query": f"{query} in {location}",
-        "page": str(page),
-        "num_pages": "1",
-    }
+    Glassdoor, etc. natively; job_publisher tells us the source board.
+    JSearch v5 renamed /search to /search-v2 and nests results under
+    data.jobs — try v2 first and fall back to v1 for older subscriptions."""
     headers = {
         "x-rapidapi-key": RAPIDAPI_KEY,
         "x-rapidapi-host": "jsearch.p.rapidapi.com",
     }
 
-    response = requests.get(url, headers=headers, params=querystring, timeout=30)
+    response = requests.get(
+        "https://jsearch.p.rapidapi.com/search-v2",
+        headers=headers,
+        params={
+            "query": f"{query} in {location}",
+            "num_pages": "1",
+            "date_posted": "all",
+            "country": _adzuna_country(location),
+        },
+        timeout=30,
+    )
+    if response.status_code == 404:
+        # Older subscriptions only have the v1 endpoint
+        response = requests.get(
+            "https://jsearch.p.rapidapi.com/search",
+            headers=headers,
+            params={"query": f"{query} in {location}", "page": str(page), "num_pages": "1"},
+            timeout=30,
+        )
 
     if response.status_code == 429:
         raise QuotaExceeded("JSearch monthly quota reached.")
@@ -60,10 +74,12 @@ def _fetch_jobs_jsearch(query: str, location: str, page: int = 1) -> List[dict]:
             "Job search API key was rejected. Check RAPIDAPI_KEY in Railway environment variables."
         )
     response.raise_for_status()
-    data = response.json()
+
+    payload = response.json().get("data")
+    raw_jobs = payload.get("jobs", []) if isinstance(payload, dict) else (payload or [])
 
     job_results = []
-    for job in data.get("data", []):
+    for job in raw_jobs:
         job_results.append({
             "title": job.get("job_title"),
             "company": job.get("employer_name"),
