@@ -15,7 +15,7 @@ if sys.platform == 'win32':
 # Create database tables
 Base.metadata.create_all(bind=engine)
 
-app = FastAPI(title="RoleFlight API")
+app = FastAPI(title="AriseJobs API")
 
 
 @app.middleware("http")
@@ -146,4 +146,4 @@ if os.path.isdir(_frontend_dist):
 else:
     @app.get("/")
     def read_root():
-        return {"message": "RoleFlight API — frontend not built"}
+        return {"message": "AriseJobs API — frontend not built"}

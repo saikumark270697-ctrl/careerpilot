@@ -1,4 +1,4 @@
-# RoleFlight
+# AriseJobs
 
 An AI-powered agentic job search and resume matching platform.
 

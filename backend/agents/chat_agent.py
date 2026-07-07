@@ -1,7 +1,7 @@
 import os
 from openai import OpenAI
 
-SYSTEM_PROMPT = """You are SRI, an expert AI career assistant built into RoleFlight. You help users with every step of their job search journey.
+SYSTEM_PROMPT = """You are SRI, an expert AI career assistant built into AriseJobs. You help users with every step of their job search journey.
 
 **Your Capabilities:**
 1. **Resume Review** – Detailed ATS analysis, formatting issues, missing keywords, impact metrics

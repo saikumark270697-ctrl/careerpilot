@@ -25,7 +25,7 @@ const COMPARISON = [
 ];
 
 const FAQ_TEASER = [
-  { q: 'Is RoleFlight really free?', a: 'Yes — upload your resume, get your ATS score, and browse live job matches completely free. No credit card required to start.' },
+  { q: 'Is AriseJobs really free?', a: 'Yes — upload your resume, get your ATS score, and browse live job matches completely free. No credit card required to start.' },
   { q: 'How does the ATS score work?', a: 'We analyze your resume the way applicant tracking systems do — keywords, structure, and formatting — then score it against your target role and tell you exactly what to fix.' },
   { q: 'Does auto-apply spam job boards?', a: 'No. You choose each job you want to apply to; the AI just does the tedious form-filling. Quality applications, not spray-and-pray.' },
 ];
@@ -48,11 +48,11 @@ const Landing = () => {
           <Zap size={12} /> AI-powered job search · Groq + Llama 3.3
         </div>
         <h1 className="heading-1">
-          Land interviews, <span className="hero-grad">not rejections</span>
+          Time to <span className="hero-grad">arise.</span>
         </h1>
         <p className="hero-subtitle">
-          Upload your resume once. Get your ATS score, live job matches from 50+ boards,
-          AI auto-apply, and a career assistant that guides every step — all in one place.
+          Find better jobs, faster. Upload your resume once — get your ATS score, live job
+          matches from 50+ boards, AI auto-apply, and a career assistant that guides every step.
         </p>
         <div className="hero-cta-row">
           <Link to="/signup" className="hero-cta-primary">
@@ -74,7 +74,7 @@ const Landing = () => {
           <div className="preview-window">
             <div className="preview-titlebar">
               <span className="preview-dot" /><span className="preview-dot" /><span className="preview-dot" />
-              <span className="preview-url">roleflight — dashboard</span>
+              <span className="preview-url">arisejobs — dashboard</span>
             </div>
             <div className="preview-body">
               <div className="preview-score">
@@ -162,7 +162,7 @@ const Landing = () => {
       {/* ── Comparison ───────────────────────────────── */}
       <div className="landing-section">
         <div className="section-head">
-          <div className="section-tag"><Target size={12} /> Why RoleFlight</div>
+          <div className="section-tag"><Target size={12} /> Why AriseJobs</div>
           <h2 className="section-title">Point tools solve half the problem</h2>
           <p className="section-sub">Resume checkers don't find you jobs. Auto-appliers don't fix your resume. We do the whole pipeline.</p>
         </div>
@@ -171,7 +171,7 @@ const Landing = () => {
             <thead>
               <tr>
                 <th>Feature</th>
-                <th className="cmp-us-col"><Rocket size={13} /> RoleFlight</th>
+                <th className="cmp-us-col"><Rocket size={13} /> AriseJobs</th>
                 <th>Resume checkers</th>
                 <th>Auto-apply bots</th>
                 <th>Job trackers</th>

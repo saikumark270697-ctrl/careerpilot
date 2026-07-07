@@ -33,7 +33,7 @@ ALGORITHM = "HS256"
 TOKEN_EXPIRE_DAYS = 30
 OTP_EXPIRE_MINUTES = int(os.getenv("OTP_EXPIRE_MINUTES", "10"))
 OTP_MAX_ATTEMPTS = int(os.getenv("OTP_MAX_ATTEMPTS", "5"))
-OTP_FROM_EMAIL = os.getenv("OTP_FROM_EMAIL", "RoleFlight <onboarding@resend.dev>")
+OTP_FROM_EMAIL = os.getenv("OTP_FROM_EMAIL", "AriseJobs <onboarding@resend.dev>")
 OTP_DEV_MODE = os.getenv("OTP_DEV_MODE", "").lower() in {"1", "true", "yes"}
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/auth/login", auto_error=False)
@@ -62,7 +62,7 @@ def _hash_otp(email: str, code: str) -> str:
 
 def _display_name_from_email(email: str) -> str:
     local = email.split("@", 1)[0].replace(".", " ").replace("_", " ").replace("-", " ").strip()
-    return " ".join(part.capitalize() for part in local.split()) or "RoleFlight User"
+    return " ".join(part.capitalize() for part in local.split()) or "AriseJobs User"
 
 
 def _is_expired(expires_at: datetime) -> bool:
@@ -86,10 +86,10 @@ def _send_otp_email(email: str, code: str):
         resend.Emails.send({
             "from": OTP_FROM_EMAIL,
             "to": [email],
-            "subject": "Your RoleFlight login code",
+            "subject": "Your AriseJobs login code",
             "html": f"""
                 <div style="font-family:Arial,sans-serif;line-height:1.6;color:#111827">
-                  <h2>Your RoleFlight login code</h2>
+                  <h2>Your AriseJobs login code</h2>
                   <p>Use this code to sign in. It expires in {OTP_EXPIRE_MINUTES} minutes.</p>
                   <p style="font-size:28px;font-weight:700;letter-spacing:6px">{code}</p>
                   <p>If you did not request this, you can ignore this email.</p>
