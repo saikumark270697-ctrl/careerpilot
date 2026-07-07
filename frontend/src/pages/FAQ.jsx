@@ -89,7 +89,8 @@ const FAQ = () => {
         </h1>
         <p className="faq-hero-sub">
           Got questions? We have answers. Can't find what you're looking for?
-          Ask <strong>SRI</strong> directly — just click the chat button below.
+          Ask <strong>SRI</strong> directly — just click the chat button below, or write
+          to us at <a href="mailto:info@arisejobs.com" className="auth-link">info@arisejobs.com</a>.
         </p>
       </div>
 

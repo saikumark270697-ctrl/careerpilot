@@ -95,9 +95,10 @@ function Footer() {
           <Link to="/faq" className="footer-link">FAQ</Link>
           {!user && <Link to="/login" className="footer-link">Sign In</Link>}
           {!user && <Link to="/signup" className="footer-link">Get Started</Link>}
+          <a href="mailto:info@arisejobs.com" className="footer-link">Contact</a>
         </div>
         <p className="footer-copy">
-          © 2025 AriseJobs · Powered by Groq + Llama 3.3 · Built for job seekers worldwide
+          © 2026 AriseJobs · info@arisejobs.com · Built for job seekers worldwide
         </p>
       </div>
     </footer>
