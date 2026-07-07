@@ -133,6 +133,11 @@ def search_jobs(query: str, location: str = "remote", num_pages: int = 1) -> Lis
             return _fetch_jobs_adzuna(query, location)
         except QuotaExceeded:
             providers_tried.append("Adzuna (quota reached)")
+        except Exception as e:
+            # Never bubble raw request errors up — exception text can contain
+            # the request URL with API credentials in it.
+            print(f"[job_search] Adzuna failed: {type(e).__name__}")
+            providers_tried.append("Adzuna (temporarily unavailable)")
 
     if providers_tried:
         raise ValueError(

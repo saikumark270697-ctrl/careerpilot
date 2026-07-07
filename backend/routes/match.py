@@ -74,7 +74,10 @@ def find_job_matches(request: MatchRequest, user=Depends(get_current_user)):
     except ValueError as e:
         raise HTTPException(status_code=503, detail=str(e))
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Job search error: {str(e)}")
+        # Raw exception text can include request URLs with credentials — log it
+        # server-side, show the user a clean message.
+        print(f"[match] job search failed: {e}")
+        raise HTTPException(status_code=500, detail="Job search failed unexpectedly. Please try again in a minute.")
     
     # Soft Domain Filtering:
     # Try to filter by keywords, but if it removes everything, relax and use all results.
