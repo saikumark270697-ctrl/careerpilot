@@ -33,7 +33,9 @@ ALGORITHM = "HS256"
 TOKEN_EXPIRE_DAYS = 30
 OTP_EXPIRE_MINUTES = int(os.getenv("OTP_EXPIRE_MINUTES", "10"))
 OTP_MAX_ATTEMPTS = int(os.getenv("OTP_MAX_ATTEMPTS", "5"))
-OTP_FROM_EMAIL = os.getenv("OTP_FROM_EMAIL", "AriseJobs <onboarding@resend.dev>")
+# Collapse any accidental newlines/extra spaces from the env var — a line-break
+# inside the From header makes Resend fail domain matching with a 403.
+OTP_FROM_EMAIL = " ".join(os.getenv("OTP_FROM_EMAIL", "AriseJobs <onboarding@resend.dev>").split()).replace("< ", "<").replace(" >", ">")
 OTP_DEV_MODE = os.getenv("OTP_DEV_MODE", "").lower() in {"1", "true", "yes"}
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/auth/login", auto_error=False)
