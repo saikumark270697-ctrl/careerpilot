@@ -89,6 +89,7 @@ async def rate_limiter(request, call_next):
 
 # ── CORS: only the real frontend origins, not the whole internet ────────────
 _default_origins = (
+    "https://arisejobs.com,https://www.arisejobs.com,"
     "https://careerpilot-production-31bf.up.railway.app,"
     "http://localhost:5173,http://localhost:4173,http://127.0.0.1:5173"
 )
