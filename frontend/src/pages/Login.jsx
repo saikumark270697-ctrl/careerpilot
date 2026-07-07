@@ -92,11 +92,6 @@ const Login = () => {
     }
   };
 
-  const showProviderSetup = (provider) => {
-    setError(`${provider} sign-in needs OAuth client IDs configured first. Use Email code for now.`);
-    setInfo('');
-  };
-
   if (authLoading) {
     return (
       <div className="auth-page">
@@ -122,17 +117,6 @@ const Login = () => {
           <h1 className="auth-title">Welcome back</h1>
           <p className="auth-subtitle">Sign in to continue your job search with <strong>Arise</strong></p>
         </div>
-
-        <div className="social-login-grid">
-          <button type="button" className="social-login-btn" onClick={() => showProviderSetup('Google')}>
-            <span className="social-mark">G</span> Continue with Google
-          </button>
-          <button type="button" className="social-login-btn" onClick={() => showProviderSetup('Apple')}>
-            <span className="social-mark">A</span> Continue with Apple
-          </button>
-        </div>
-
-        <div className="auth-divider"><span>or</span></div>
 
         <div className="auth-mode-tabs" role="tablist" aria-label="Sign in method">
           <button
