@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Link, Navigate, useLocation, useNavigate } from 'react-router-dom';
 import { Rocket, Mail, Lock, Eye, EyeOff, AlertCircle, ArrowRight, KeyRound } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import GoogleSignIn from '../components/GoogleSignIn';
 
 const API_BASE = import.meta.env.VITE_API_URL || '';
 
@@ -117,6 +118,13 @@ const Login = () => {
           <h1 className="auth-title">Welcome back</h1>
           <p className="auth-subtitle">Sign in to continue your job search with <strong>Arise</strong></p>
         </div>
+
+        <GoogleSignIn
+          onSuccess={(userData, token) => { login(userData, token); navigate(from, { replace: true }); }}
+          onError={(msg) => { setError(msg); setInfo(''); }}
+        />
+
+        <div className="auth-divider"><span>or</span></div>
 
         <div className="auth-mode-tabs" role="tablist" aria-label="Sign in method">
           <button

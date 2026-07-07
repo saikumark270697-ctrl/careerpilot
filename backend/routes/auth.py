@@ -244,6 +244,57 @@ def verify_login_code(req: OtpVerifyRequest, db: Session = Depends(get_db)):
     return {"token": _create_token(user.id, user.email), "user": _user_dict(user)}
 
 
+GOOGLE_CLIENT_ID = os.getenv(
+    "GOOGLE_CLIENT_ID",
+    "578917335981-c4v4h04usvhd1t1m1l2hbvvklh8b00re.apps.googleusercontent.com",
+)
+
+
+class GoogleAuthRequest(BaseModel):
+    credential: str
+
+
+@router.post("/google")
+def google_sign_in(req: GoogleAuthRequest, db: Session = Depends(get_db)):
+    """Verify a Google Identity Services ID token and sign the user in,
+    creating their account on first sign-in."""
+    import requests as _requests
+
+    try:
+        resp = _requests.get(
+            "https://oauth2.googleapis.com/tokeninfo",
+            params={"id_token": req.credential},
+            timeout=10,
+        )
+    except Exception:
+        raise HTTPException(status_code=502, detail="Could not reach Google to verify sign-in. Try again.")
+
+    if resp.status_code != 200:
+        raise HTTPException(status_code=401, detail="Google sign-in could not be verified. Please try again.")
+
+    claims = resp.json()
+    if claims.get("aud") != GOOGLE_CLIENT_ID:
+        raise HTTPException(status_code=401, detail="Google sign-in token was issued for a different app.")
+    if claims.get("iss") not in ("accounts.google.com", "https://accounts.google.com"):
+        raise HTTPException(status_code=401, detail="Google sign-in token has an invalid issuer.")
+    if claims.get("email_verified") not in (True, "true"):
+        raise HTTPException(status_code=401, detail="Your Google email address is not verified.")
+
+    email = _normalize_email(claims.get("email", ""))
+    if not email:
+        raise HTTPException(status_code=401, detail="Google did not share an email address.")
+
+    user = db.query(models.UserProfile).filter(models.UserProfile.email == email).first()
+    if not user:
+        name = (claims.get("name") or _display_name_from_email(email)).strip()
+        user = models.UserProfile(name=name, email=email, hashed_password=None)
+        db.add(user)
+        db.commit()
+        db.refresh(user)
+
+    return {"token": _create_token(user.id, user.email), "user": _user_dict(user)}
+
+
 @router.get("/me")
 def me(current_user=Depends(get_current_user)):
     return _user_dict(current_user)
