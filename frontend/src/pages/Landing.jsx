@@ -10,7 +10,7 @@ const FEATURES = [
   { icon: <Target size={20} />, title: 'ATS Score & Feedback', desc: 'Instant compatibility score with concrete, line-level fixes — know exactly why your resume gets filtered out.' },
   { icon: <Briefcase size={20} />, title: 'Live Job Matches', desc: 'Real openings pulled from LinkedIn, Naukri, Indeed and 50+ boards the moment you analyze — no stale listings.' },
   { icon: <Send size={20} />, title: 'AI Auto-Apply', desc: 'One click and the AI fills the application for you. You stay in control of what gets submitted.' },
-  { icon: <Bot size={20} />, title: 'SRI — Career Chatbot', desc: 'Interview prep, cover letters, salary negotiation — an assistant that has actually read your resume.' },
+  { icon: <Bot size={20} />, title: 'Arise — Career Chatbot', desc: 'Interview prep, cover letters, salary negotiation — an assistant that has actually read your resume.' },
   { icon: <MapPin size={20} />, title: 'Multi-Location Search', desc: 'Search Remote + Hyderabad + USA in one pass. Tag as many locations as your search needs.' },
   { icon: <Shield size={20} />, title: 'Private by Default', desc: 'Your resume is processed in-memory and never sold or shared. Delete your data anytime.' },
 ];
@@ -154,7 +154,7 @@ const Landing = () => {
             <div className="step-num">03</div>
             <span className="step-emoji">🚀</span>
             <h3>Apply with AI</h3>
-            <p>Auto-apply to the jobs you pick, prep interviews with SRI, and walk in knowing you're the strongest match.</p>
+            <p>Auto-apply to the jobs you pick, prep interviews with Arise, and walk in knowing you're the strongest match.</p>
           </div>
         </div>
       </div>

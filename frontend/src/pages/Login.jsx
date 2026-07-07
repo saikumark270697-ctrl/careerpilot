@@ -120,7 +120,7 @@ const Login = () => {
 
         <div className="auth-header">
           <h1 className="auth-title">Welcome back</h1>
-          <p className="auth-subtitle">Sign in to continue your job search with <strong>SRI</strong></p>
+          <p className="auth-subtitle">Sign in to continue your job search with <strong>Arise</strong></p>
         </div>
 
         <div className="social-login-grid">

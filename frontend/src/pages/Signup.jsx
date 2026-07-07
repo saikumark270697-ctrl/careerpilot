@@ -65,7 +65,7 @@ const Signup = () => {
 
         <div className="auth-header">
           <h1 className="auth-title">Create your account</h1>
-          <p className="auth-subtitle">Start your job search journey with <strong>SRI</strong> - free forever</p>
+          <p className="auth-subtitle">Start your job search journey with <strong>Arise</strong> - free forever</p>
         </div>
 
         {error && (

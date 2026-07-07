@@ -95,38 +95,30 @@ const QUICK_ACTIONS = [
 
 const FREE_LIMIT = 3; // messages before prompting sign-up
 
-const welcomeMsg = (user, atsScore, jobCount) => {
-  if (user) {
-    return `👋 Welcome back, **${user.name}**!\n\n` +
-      (atsScore != null
-        ? `Your resume has an ATS score of **${atsScore}/100** and **${jobCount || 0} job matches** ready.\n\n`
-        : '') +
-      `**What can I help you with today?**\n- 📋 Resume review & ATS optimization\n- 💼 Interview prep & mock questions\n- 💻 Coding test assistance\n- ✉️ Cover letters\n- 🔍 Job search strategy`;
-  }
-  return `👋 Hi! I'm **SRI**, your AI career assistant.\n\nI can help you find jobs, improve your resume, prep for interviews, and more.\n\n**Try asking me:**\n- "Review my resume"\n- "What jobs suit me?"\n- "Give me interview tips"\n\n🔒 **Sign in** for personalized advice with full resume analysis & unlimited chat.`;
-};
+const PRIMARY_ACTION = QUICK_ACTIONS[0]; // Review Resume
+const EXPLORE_ACTIONS = [QUICK_ACTIONS[2], QUICK_ACTIONS[4], QUICK_ACTIONS[6]]; // Interview / Cover Letter / Salary
 
 // ─── Main Chatbot Component ───────────────────────────────────────────────────
 
 const ChatbotInner = ({ resumeText, atsScore, jobs, user, onSignIn }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [isMinimized, setIsMinimized] = useState(false);
-  const [messages, setMessages] = useState([{ role: 'assistant', content: welcomeMsg(user, atsScore, jobs?.length) }]);
+  const [messages, setMessages] = useState([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [copiedIdx, setCopiedIdx] = useState(null);
-  const [showActions, setShowActions] = useState(true);
   const [userMsgCount, setUserMsgCount] = useState(0);
   const messagesEndRef = useRef(null);
   const inputRef = useRef(null);
   const prevUserRef = useRef(user?.id);
 
+  const showWelcome = messages.length === 0;
+
   useEffect(() => {
     if (user?.id !== prevUserRef.current) {
       prevUserRef.current = user?.id;
-      setMessages([{ role: 'assistant', content: welcomeMsg(user, atsScore, jobs?.length) }]);
+      setMessages([]);
       setUserMsgCount(0);
-      setShowActions(true);
     }
   }, [user?.id]);
 
@@ -151,7 +143,6 @@ const ChatbotInner = ({ resumeText, atsScore, jobs, user, onSignIn }) => {
     if (!userText || isLoading) return;
 
     setInput('');
-    setShowActions(false);
 
     const newCount = userMsgCount + 1;
     setUserMsgCount(newCount);
@@ -208,8 +199,7 @@ const ChatbotInner = ({ resumeText, atsScore, jobs, user, onSignIn }) => {
   };
 
   const clearChat = () => {
-    setMessages([{ role: 'assistant', content: welcomeMsg(user, atsScore, jobs?.length) }]);
-    setShowActions(true);
+    setMessages([]);
     setUserMsgCount(0);
   };
 
@@ -228,8 +218,8 @@ const ChatbotInner = ({ resumeText, atsScore, jobs, user, onSignIn }) => {
                 <span className="sri-status-dot" />
               </div>
               <div>
-                <div className="sri-name">SRI <span className="sri-badge">AI</span></div>
-                <div className="sri-sub"><Zap size={9} /> Groq · Llama 3.3 · Ultra-fast</div>
+                <div className="sri-name">Arise <span className="sri-badge">AI</span></div>
+                <div className="sri-sub"><Zap size={9} /> AI-powered career assistant</div>
               </div>
             </div>
             <div className="sri-header-actions" onClick={e => e.stopPropagation()}>
@@ -252,20 +242,47 @@ const ChatbotInner = ({ resumeText, atsScore, jobs, user, onSignIn }) => {
                 </div>
               )}
 
-              {/* Quick actions */}
-              {showActions && (
-                <div className="sri-quick-bar">
-                  <div className="sri-quick-scroll">
-                    {QUICK_ACTIONS.map(a => (
-                      <button key={a.label} className="sri-chip" onClick={() => sendMessage(a.prompt)} disabled={isLoading || isInputDisabled}>
-                        {a.emoji} {a.label}
+              {/* Welcome screen (Kodee-style) */}
+              {showWelcome ? (
+                <div className="arise-welcome">
+                  <div className="arise-welcome-intro">
+                    {user
+                      ? <>Hi <strong>{user.name.split(' ')[0]}</strong> — I'm <strong>Arise</strong>. I'll help you land your next job, faster.</>
+                      : <>I'm <strong>Arise</strong> — I'll help you land your next job, faster.</>}
+                  </div>
+
+                  <button
+                    className="arise-primary-card"
+                    onClick={() => sendMessage(PRIMARY_ACTION.prompt)}
+                    disabled={isLoading || isInputDisabled}
+                  >
+                    <span className="arise-primary-icon"><Zap size={20} /></span>
+                    <span className="arise-primary-text">
+                      <span className="arise-primary-title">Review my resume</span>
+                      <span className="arise-primary-sub">Most popular · takes 1 min</span>
+                    </span>
+                    <span className="arise-primary-arrow">›</span>
+                  </button>
+
+                  <div className="arise-divider"><span>or explore</span></div>
+
+                  <div className="arise-explore-grid">
+                    {EXPLORE_ACTIONS.map(a => (
+                      <button
+                        key={a.label}
+                        className="arise-explore-card"
+                        onClick={() => sendMessage(a.prompt)}
+                        disabled={isLoading || isInputDisabled}
+                      >
+                        <span className="arise-explore-icon">{a.emoji}</span>
+                        <span className="arise-explore-label">{a.label}</span>
                       </button>
                     ))}
                   </div>
                 </div>
-              )}
+              ) : (
 
-              {/* Messages */}
+              /* Messages */
               <div className="sri-messages">
                 {messages.map((msg, i) => (
                   <div key={i} className={`sri-msg-row ${msg.role}`}>
@@ -301,6 +318,7 @@ const ChatbotInner = ({ resumeText, atsScore, jobs, user, onSignIn }) => {
                 )}
                 <div ref={messagesEndRef} />
               </div>
+              )}
 
               {/* Input */}
               {isInputDisabled ? (
@@ -315,7 +333,7 @@ const ChatbotInner = ({ resumeText, atsScore, jobs, user, onSignIn }) => {
                     <textarea
                       ref={inputRef}
                       className="sri-input"
-                      placeholder={user ? "Ask about resume, jobs, interview prep, coding…" : "Ask me anything career-related…"}
+                      placeholder="Message Arise…"
                       value={input}
                       onChange={e => {
                         setInput(e.target.value);
@@ -342,10 +360,10 @@ const ChatbotInner = ({ resumeText, atsScore, jobs, user, onSignIn }) => {
       <button
         className={`sri-fab ${isOpen ? 'sri-fab-open' : ''}`}
         onClick={() => { setIsOpen(v => !v); setIsMinimized(false); }}
-        aria-label="Open SRI Career Assistant"
+        aria-label="Open Arise Career Assistant"
       >
         <div className="sri-fab-icon">{isOpen ? <X size={21} /> : <MessageCircle size={21} />}</div>
-        {!isOpen && <span className="sri-fab-text">Ask SRI</span>}
+        {!isOpen && <span className="sri-fab-text">Ask Arise</span>}
       </button>
     </>
   );
