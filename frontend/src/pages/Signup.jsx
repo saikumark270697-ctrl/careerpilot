@@ -10,28 +10,94 @@ const Signup = () => {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [confirmPw, setConfirmPw] = useState('');
   const [showPw, setShowPw] = useState(false);
+  const [step, setStep] = useState('form'); // 'form' | 'verify'
+  const [otpCode, setOtpCode] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [info, setInfo] = useState('');
   const { user, loading: authLoading, login } = useAuth();
   const navigate = useNavigate();
 
+  const registerAccount = async (code) => {
+    const res = await fetch(`${API_BASE}/api/auth/register`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        name: name.trim(),
+        email: email.trim(),
+        password,
+        ...(code ? { otp_code: code } : {}),
+      }),
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.detail || 'Registration failed.');
+    login(data.user, data.token);
+    navigate('/dashboard', { replace: true });
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!name || !email || !password) { setError('Please fill in all fields.'); return; }
+    if (!name || !email || !password || !confirmPw) { setError('Please fill in all fields.'); return; }
     if (password.length < 6) { setError('Password must be at least 6 characters.'); return; }
+    if (password !== confirmPw) { setError('Passwords do not match.'); return; }
+    setLoading(true);
+    setError('');
+    setInfo('');
+    try {
+      // Try to verify the email with a code first
+      const res = await fetch(`${API_BASE}/api/auth/otp/request`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: email.trim(), name: name.trim() }),
+      });
+      if (res.ok) {
+        setStep('verify');
+        setInfo(`We emailed a 6-digit code to ${email.trim()}. Enter it below to verify your email.`);
+      } else {
+        // Email service unavailable (quota/config) — fall back to direct signup
+        await registerAccount(null);
+      }
+    } catch (err) {
+      // Network or registration error — try direct signup as last resort
+      try {
+        await registerAccount(null);
+      } catch (err2) {
+        setError(err2.message);
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleVerify = async (e) => {
+    e.preventDefault();
+    const code = otpCode.replace(/\D/g, '');
+    if (code.length !== 6) { setError('Enter the 6-digit code from your email.'); return; }
     setLoading(true);
     setError('');
     try {
-      const res = await fetch(`${API_BASE}/api/auth/register`, {
+      await registerAccount(code);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const resendCode = async () => {
+    setLoading(true);
+    setError('');
+    try {
+      const res = await fetch(`${API_BASE}/api/auth/otp/request`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name: name.trim(), email: email.trim(), password }),
+        body: JSON.stringify({ email: email.trim(), name: name.trim() }),
       });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.detail || 'Registration failed.');
-      login(data.user, data.token);
-      navigate('/dashboard', { replace: true });
+      if (!res.ok) throw new Error(data.detail || 'Could not resend the code.');
+      setInfo('New code sent. Check your inbox (and spam folder).');
     } catch (err) {
       setError(err.message);
     } finally {
@@ -82,7 +148,36 @@ const Signup = () => {
             <span>{error}</span>
           </div>
         )}
+        {info && <div className="auth-info">{info}</div>}
 
+        {step === 'verify' ? (
+        <form onSubmit={handleVerify} className="auth-form">
+          <div className="auth-field">
+            <label className="auth-label">Verification code</label>
+            <div className="auth-input-wrap">
+              <Mail size={16} className="auth-input-icon" />
+              <input
+                type="text"
+                inputMode="numeric"
+                maxLength={6}
+                className="auth-input"
+                placeholder="6-digit code"
+                value={otpCode}
+                onChange={e => setOtpCode(e.target.value.replace(/\D/g, ''))}
+                autoFocus
+              />
+            </div>
+          </div>
+          <button type="submit" className="auth-submit" disabled={loading}>
+            {loading ? <span className="auth-spinner" /> : <><Sparkles size={16} /> Verify & Create Account</>}
+          </button>
+          <p className="auth-switch" style={{ marginTop: 10 }}>
+            <button type="button" className="auth-secondary-btn" onClick={resendCode} disabled={loading}>Resend code</button>
+            {' · '}
+            <button type="button" className="auth-secondary-btn" onClick={() => { setStep('form'); setInfo(''); setError(''); setOtpCode(''); }} disabled={loading}>Change details</button>
+          </p>
+        </form>
+        ) : (
         <form onSubmit={handleSubmit} className="auth-form">
           <div className="auth-field">
             <label className="auth-label">Full name</label>
@@ -141,10 +236,28 @@ const Signup = () => {
             )}
           </div>
 
+          <div className="auth-field">
+            <label className="auth-label">Re-enter password</label>
+            <div className="auth-input-wrap">
+              <Lock size={16} className="auth-input-icon" />
+              <input
+                type={showPw ? 'text' : 'password'}
+                className="auth-input"
+                placeholder="Type your password again"
+                value={confirmPw}
+                onChange={e => setConfirmPw(e.target.value)}
+              />
+            </div>
+            {confirmPw && password !== confirmPw && (
+              <span style={{ color: 'var(--red)', fontSize: '0.72rem' }}>Passwords do not match</span>
+            )}
+          </div>
+
           <button type="submit" className="auth-submit" disabled={loading}>
             {loading ? <span className="auth-spinner" /> : <><Sparkles size={16} /> Create Account</>}
           </button>
         </form>
+        )}
 
         <p className="auth-switch">
           Already have an account?{' '}

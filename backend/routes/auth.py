@@ -129,6 +129,7 @@ class RegisterRequest(BaseModel):
     name: str
     email: str
     password: str
+    otp_code: Optional[str] = None  # emailed verification code; optional so signup still works when email is down
 
 
 class LoginRequest(BaseModel):
@@ -151,12 +152,41 @@ def _user_dict(user) -> dict:
     return {"id": user.id, "name": user.name, "email": user.email}
 
 
+def _consume_otp_or_400(db: Session, email: str, code: str):
+    """Validate and consume an emailed verification code. Raises 400 on failure."""
+    code = "".join(ch for ch in code.strip() if ch.isdigit())
+    if len(code) != 6:
+        raise HTTPException(status_code=400, detail="Enter the 6-digit code from your email.")
+    login_code = db.query(models.EmailLoginCode).filter(
+        models.EmailLoginCode.email == email,
+        models.EmailLoginCode.consumed_at.is_(None),
+    ).order_by(models.EmailLoginCode.created_at.desc()).first()
+    if not login_code:
+        raise HTTPException(status_code=400, detail="No active verification code. Request a new one.")
+    if _is_expired(login_code.expires_at):
+        login_code.consumed_at = datetime.utcnow()
+        db.commit()
+        raise HTTPException(status_code=400, detail="Verification code expired. Request a new one.")
+    if login_code.attempts >= OTP_MAX_ATTEMPTS:
+        login_code.consumed_at = datetime.utcnow()
+        db.commit()
+        raise HTTPException(status_code=429, detail="Too many attempts. Request a new code.")
+    login_code.attempts += 1
+    if login_code.code_hash != _hash_otp(email, code):
+        db.commit()
+        raise HTTPException(status_code=400, detail="Invalid verification code.")
+    login_code.consumed_at = datetime.utcnow()
+    db.commit()
+
+
 @router.post("/register")
 def register(req: RegisterRequest, db: Session = Depends(get_db)):
     if db.query(models.UserProfile).filter(models.UserProfile.email == req.email).first():
         raise HTTPException(status_code=400, detail="Email already registered. Please sign in.")
     if len(req.password) < 6:
         raise HTTPException(status_code=400, detail="Password must be at least 6 characters.")
+    if req.otp_code:
+        _consume_otp_or_400(db, _normalize_email(req.email), req.otp_code)
     hashed = _hash_pw(req.password)
     user = models.UserProfile(name=req.name.strip(), email=req.email.lower().strip(), hashed_password=hashed)
     db.add(user)
