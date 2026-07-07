@@ -89,6 +89,11 @@ const Dashboard = () => {
   const [error, setError] = useState('');
   const [applyingJobs, setApplyingJobs] = useState({});
   const [appliedJobs, setAppliedJobs] = useState({});
+  const [jobPage, setJobPage] = useState(1);
+
+  const JOBS_PER_PAGE = 5;
+  const totalPages = Math.ceil(jobs.length / JOBS_PER_PAGE);
+  const pagedJobs = jobs.slice((jobPage - 1) * JOBS_PER_PAGE, jobPage * JOBS_PER_PAGE);
 
   const timeAgo = (dateString) => {
     if (!dateString) return '';
@@ -164,6 +169,7 @@ const Dashboard = () => {
       const data = await response.json();
       if (response.ok) {
         setJobs(data.jobs.map((job, index) => ({ ...job, id: job.id ?? index })));
+        setJobPage(1);
         setSearchQuery(data.search_query);
         setAtsScore(data.ats_score);
         setFeedback(data.feedback);
@@ -327,8 +333,9 @@ const Dashboard = () => {
               <p className="body-text-bold" style={{ color: 'var(--primary)' }}>Searching live job databases…</p>
             </div>
           ) : (
+            <>
             <div className="jobs-grid animate-fade-in">
-              {jobs.map((job, index) => (
+              {pagedJobs.map((job, index) => (
                 <div key={job.id} className="job-card" style={{ animation: `fadeIn 0.4s ease-out ${0.06 * index}s backwards` }}>
                   <div className="job-header">
                     <div style={{ flex: 1, minWidth: 0 }}>
@@ -377,6 +384,35 @@ const Dashboard = () => {
                 </div>
               ))}
             </div>
+
+            {totalPages > 1 && (
+              <div className="jobs-pagination">
+                <button
+                  className="page-btn page-nav"
+                  onClick={() => setJobPage(p => Math.max(1, p - 1))}
+                  disabled={jobPage === 1}
+                >
+                  ‹ Prev
+                </button>
+                {Array.from({ length: totalPages }, (_, i) => i + 1).map(p => (
+                  <button
+                    key={p}
+                    className={`page-btn ${p === jobPage ? 'page-active' : ''}`}
+                    onClick={() => setJobPage(p)}
+                  >
+                    {p}
+                  </button>
+                ))}
+                <button
+                  className="page-btn page-nav"
+                  onClick={() => setJobPage(p => Math.min(totalPages, p + 1))}
+                  disabled={jobPage === totalPages}
+                >
+                  Next ›
+                </button>
+              </div>
+            )}
+            </>
           )}
         </div>
       </div>

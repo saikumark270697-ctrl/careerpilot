@@ -6,17 +6,17 @@ const FAQ_DATA = [
   {
     icon: '🚀',
     q: 'What is AriseJobs?',
-    a: 'AriseJobs is an AI-powered career acceleration platform. Upload your resume, receive an instant ATS compatibility score, discover live job matches from LinkedIn, Naukri, and 50+ platforms, and get personalized coaching from Arise — your AI career assistant powered by Groq and Llama 3.3.',
+    a: 'AriseJobs is an AI-powered career acceleration platform. Upload your resume, receive an instant ATS compatibility score, discover live job matches from LinkedIn, Naukri, and 50+ platforms, and get personalized coaching from Arise, your AI career assistant powered by Groq and Llama 3.3.',
   },
   {
     icon: '🤖',
     q: 'How does Arise, the AI assistant, work?',
-    a: 'Arise is built on Groq\'s ultra-fast inference engine running Meta\'s Llama 3.3 70B model — one of the most capable open-source language models available. Arise reads your uploaded resume and job context in real time to give personalized, expert-level career advice rather than generic tips.',
+    a: 'Arise is built on Groq\'s ultra-fast inference engine running Meta\'s Llama 3.3 70B model, one of the most capable open-source language models available. Arise reads your uploaded resume and job context in real time to give personalized, expert-level career advice rather than generic tips.',
   },
   {
     icon: '💸',
     q: 'Is AriseJobs free?',
-    a: 'Yes — completely free to start. Upload your resume, get your ATS score, see live job matches, and ask Arise 3 questions all without creating an account. Sign up for a free account to unlock unlimited Arise conversations, full resume analysis with personalized feedback, and interview preparation tools.',
+    a: 'Yes, completely free to start. Upload your resume, get your ATS score, see live job matches, and ask Arise 3 questions all without creating an account. Sign up for a free account to unlock unlimited Arise conversations, full resume analysis with personalized feedback, and interview preparation tools.',
   },
   {
     icon: '📄',
@@ -31,7 +31,7 @@ const FAQ_DATA = [
   {
     icon: '🔍',
     q: 'How does live job matching work?',
-    a: 'After analyzing your resume, we extract your top skills and target role, then search live job databases across LinkedIn, Naukri, and other major platforms in real time. Each match is scored by compatibility — a 90%+ match means your skills closely align with the job requirements. We search up to 3 location preferences simultaneously.',
+    a: 'After analyzing your resume, we extract your top skills and target role, then search live job databases across LinkedIn, Naukri, and other major platforms in real time. Each match is scored by compatibility. A 90%+ match means your skills closely align with the job requirements. We search up to 3 location preferences simultaneously.',
   },
   {
     icon: '🔒',
@@ -51,7 +51,7 @@ const FAQ_DATA = [
   {
     icon: '⚡',
     q: 'Why is the AI response so fast?',
-    a: 'We use Groq\'s LPU (Language Processing Unit) hardware — purpose-built silicon for AI inference that delivers 10-20x faster responses than standard GPU-based services. This means you get complete, detailed career advice in seconds rather than minutes.',
+    a: 'We use Groq\'s LPU (Language Processing Unit) hardware, purpose-built silicon for AI inference that delivers 10-20x faster responses than standard GPU-based services. This means you get complete, detailed career advice in seconds rather than minutes.',
   },
 ];
 
@@ -89,7 +89,7 @@ const FAQ = () => {
         </h1>
         <p className="faq-hero-sub">
           Got questions? We have answers. Can't find what you're looking for?
-          Ask <strong>Arise</strong> directly — just click the chat button below, or write
+          Ask <strong>Arise</strong> directly by clicking the chat button below, or write
           to us at <a href="mailto:info@arisejobs.com" className="auth-link">info@arisejobs.com</a>.
         </p>
       </div>
@@ -113,7 +113,7 @@ const FAQ = () => {
         <div className="faq-stat-sep" />
         <div className="faq-stat">
           <Star size={16} className="faq-stat-icon" />
-          <span>Free to start — no card required</span>
+          <span>Free to start, no card required</span>
         </div>
       </div>
 

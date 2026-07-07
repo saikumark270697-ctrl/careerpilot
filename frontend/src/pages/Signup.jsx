@@ -3,6 +3,7 @@ import { Link, Navigate, useNavigate } from 'react-router-dom';
 import { Rocket, User, Mail, Lock, Eye, EyeOff, AlertCircle, Sparkles } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import GoogleSignIn from '../components/GoogleSignIn';
+import AuthShowcase from '../components/AuthShowcase';
 
 const API_BASE = import.meta.env.VITE_API_URL || '';
 
@@ -124,6 +125,7 @@ const Signup = () => {
 
   return (
     <div className="auth-page">
+      <AuthShowcase />
       <div className="auth-card">
         <Link to="/" className="auth-brand">
           <Rocket size={26} className="auth-brand-icon" />

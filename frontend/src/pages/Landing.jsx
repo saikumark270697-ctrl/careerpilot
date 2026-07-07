@@ -7,10 +7,10 @@ import {
 import { useAuth } from '../context/AuthContext';
 
 const FEATURES = [
-  { icon: <Target size={20} />, title: 'ATS Score & Feedback', desc: 'Instant compatibility score with concrete, line-level fixes — know exactly why your resume gets filtered out.' },
-  { icon: <Briefcase size={20} />, title: 'Live Job Matches', desc: 'Real openings pulled from LinkedIn, Naukri, Indeed and 50+ boards the moment you analyze — no stale listings.' },
+  { icon: <Target size={20} />, title: 'ATS Score & Feedback', desc: 'Instant compatibility score with concrete, line-level fixes, so you know exactly why your resume gets filtered out.' },
+  { icon: <Briefcase size={20} />, title: 'Live Job Matches', desc: 'Real openings pulled from LinkedIn, Naukri, Indeed and 50+ boards the moment you analyze. No stale listings.' },
   { icon: <Send size={20} />, title: 'AI Auto-Apply', desc: 'One click and the AI fills the application for you. You stay in control of what gets submitted.' },
-  { icon: <Bot size={20} />, title: 'Arise — Career Chatbot', desc: 'Interview prep, cover letters, salary negotiation — an assistant that has actually read your resume.' },
+  { icon: <Bot size={20} />, title: 'Arise, Your Career Chatbot', desc: 'Interview prep, cover letters, salary negotiation. An assistant that has actually read your resume.' },
   { icon: <MapPin size={20} />, title: 'Multi-Location Search', desc: 'Search Remote + Hyderabad + USA in one pass. Tag as many locations as your search needs.' },
   { icon: <Shield size={20} />, title: 'Private by Default', desc: 'Your resume is processed in-memory and never sold or shared. Delete your data anytime.' },
 ];
@@ -25,8 +25,8 @@ const COMPARISON = [
 ];
 
 const FAQ_TEASER = [
-  { q: 'Is AriseJobs really free?', a: 'Yes — upload your resume, get your ATS score, and browse live job matches completely free. No credit card required to start.' },
-  { q: 'How does the ATS score work?', a: 'We analyze your resume the way applicant tracking systems do — keywords, structure, and formatting — then score it against your target role and tell you exactly what to fix.' },
+  { q: 'Is AriseJobs really free?', a: 'Yes. Upload your resume, get your ATS score, and browse live job matches completely free. No credit card needed to start.' },
+  { q: 'How does the ATS score work?', a: 'We analyze your resume the way applicant tracking systems do, checking keywords, structure, and formatting. Then we score it against your target role and tell you exactly what to fix.' },
   { q: 'Does auto-apply spam job boards?', a: 'No. You choose each job you want to apply to; the AI just does the tedious form-filling. Quality applications, not spray-and-pray.' },
 ];
 
@@ -51,12 +51,12 @@ const Landing = () => {
           Time to <span className="hero-grad">arise.</span>
         </h1>
         <p className="hero-subtitle">
-          Find better jobs, faster. Upload your resume once — get your ATS score, live job
+          Find better jobs, faster. Upload your resume once and get your ATS score, live job
           matches from 50+ boards, AI auto-apply, and a career assistant that guides every step.
         </p>
         <div className="hero-cta-row">
           <Link to="/signup" className="hero-cta-primary">
-            <UploadCloud size={16} /> Analyze my resume — free
+            <UploadCloud size={16} /> Analyze my resume for free
           </Link>
           <a href="#how-it-works" className="hero-cta-secondary">
             See how it works →
@@ -74,7 +74,7 @@ const Landing = () => {
           <div className="preview-window">
             <div className="preview-titlebar">
               <span className="preview-dot" /><span className="preview-dot" /><span className="preview-dot" />
-              <span className="preview-url">arisejobs — dashboard</span>
+              <span className="preview-url">arisejobs.com/dashboard</span>
             </div>
             <div className="preview-body">
               <div className="preview-score">
@@ -148,7 +148,7 @@ const Landing = () => {
             <div className="step-num">02</div>
             <span className="step-emoji">🧠</span>
             <h3>Get scored & matched</h3>
-            <p>See your ATS compatibility score with actionable fixes, plus live job matches ranked by fit — not by ad spend.</p>
+            <p>See your ATS compatibility score with actionable fixes, plus live job matches ranked by fit, not by ad spend.</p>
           </div>
           <div className="step-card">
             <div className="step-num">03</div>
@@ -223,7 +223,7 @@ const Landing = () => {
       <div className="cta-section">
         <h2 className="cta-title">Your next role is already posted.</h2>
         <p className="cta-sub">
-          It's on one of the 50+ boards we search. Upload your resume and find it in the next two minutes — free.
+          It's on one of the 50+ boards we search. Upload your resume and find it in the next two minutes, free.
         </p>
         <div className="cta-btns">
           <Link to="/signup" className="cta-btn-primary">

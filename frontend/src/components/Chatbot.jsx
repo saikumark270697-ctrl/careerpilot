@@ -134,7 +134,7 @@ const ChatbotInner = ({ resumeText, atsScore, jobs, user, onSignIn }) => {
 
   const appendSignUpNudge = () => ({
     role: 'assistant',
-    content: `🔒 **Want more personalized help?**\n\nSign in to unlock:\n- Full resume analysis with your uploaded resume\n- Personalized interview questions for your target role\n- Unlimited conversations\n- ATS score tracking\n\n[**Sign In**](#signin) or [**Create Account**](#signup) — it's free!`,
+    content: `🔒 **Want more personalized help?**\n\nSign in to unlock:\n- Full resume analysis with your uploaded resume\n- Personalized interview questions for your target role\n- Unlimited conversations\n- ATS score tracking\n\n[**Sign In**](#signin) or [**Create Account**](#signup). It's free!`,
     isNudge: true,
   });
 
@@ -247,8 +247,8 @@ const ChatbotInner = ({ resumeText, atsScore, jobs, user, onSignIn }) => {
                 <div className="arise-welcome">
                   <div className="arise-welcome-intro">
                     {user
-                      ? <>Hi <strong>{user.name.split(' ')[0]}</strong> — I'm <strong>Arise</strong>. I'll help you land your next job, faster.</>
-                      : <>I'm <strong>Arise</strong> — I'll help you land your next job, faster.</>}
+                      ? <>Hi <strong>{user.name.split(' ')[0]}</strong>, I'm <strong>Arise</strong>. I'll help you land your next job, faster.</>
+                      : <>I'm <strong>Arise</strong>, and I'll help you land your next job, faster.</>}
                   </div>
 
                   <button
